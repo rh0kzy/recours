@@ -88,12 +88,21 @@ export default function RequestForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold text-center mb-6">Demande de Changement de Spécialité</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-2xl mx-auto p-8 bg-gray-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
+          Demande de Changement de Spécialité
+        </h1>
+        <p className="text-gray-400 text-sm">
+          Remplissez ce formulaire pour demander un changement de spécialité
+        </p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="matricule" className="block text-sm font-medium text-gray-700">Matricule</label>
-          <div className="flex gap-2">
+          <label htmlFor="matricule" className="block text-sm font-semibold text-gray-300 mb-2">
+            Matricule
+          </label>
+          <div className="flex gap-3">
             <input
               type="text"
               id="matricule"
@@ -102,22 +111,22 @@ export default function RequestForm() {
               onChange={handleChange}
               readOnly={isStudentLoaded}
               required
-              className={`mt-1 block flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${isStudentLoaded ? 'bg-gray-100' : ''}`}
+              className={`flex-1 px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${isStudentLoaded ? 'bg-gray-800/50 cursor-not-allowed' : 'hover:bg-gray-700/70'}`}
               placeholder="Entrez votre matricule"
             />
             <button
               type="button"
               onClick={handleLookup}
               disabled={isStudentLoaded}
-              className="mt-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400"
+              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
             >
               Rechercher
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="nom" className="block text-sm font-medium text-gray-700">Nom</label>
+            <label htmlFor="nom" className="block text-sm font-semibold text-gray-300 mb-2">Nom</label>
             <input
               type="text"
               id="nom"
@@ -125,11 +134,11 @@ export default function RequestForm() {
               value={formData.nom}
               onChange={handleChange}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-gray-700/70"
             />
           </div>
           <div>
-            <label htmlFor="prenom" className="block text-sm font-medium text-gray-700">Prénom</label>
+            <label htmlFor="prenom" className="block text-sm font-semibold text-gray-300 mb-2">Prénom</label>
             <input
               type="text"
               id="prenom"
@@ -137,12 +146,12 @@ export default function RequestForm() {
               value={formData.prenom}
               onChange={handleChange}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-gray-700/70"
             />
           </div>
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+          <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">Email</label>
           <input
             type="email"
             id="email"
@@ -150,11 +159,11 @@ export default function RequestForm() {
             value={formData.email}
             onChange={handleChange}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-gray-700/70"
           />
         </div>
         <div>
-          <label htmlFor="telephone" className="block text-sm font-medium text-gray-700">Téléphone</label>
+          <label htmlFor="telephone" className="block text-sm font-semibold text-gray-300 mb-2">Téléphone</label>
           <input
             type="tel"
             id="telephone"
@@ -162,11 +171,11 @@ export default function RequestForm() {
             value={formData.telephone}
             onChange={handleChange}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-gray-700/70"
           />
         </div>
         <div>
-          <label htmlFor="specialiteActuelle" className="block text-sm font-medium text-gray-700">Spécialité Actuelle</label>
+          <label htmlFor="specialiteActuelle" className="block text-sm font-semibold text-gray-300 mb-2">Spécialité Actuelle</label>
           <input
             type="text"
             id="specialiteActuelle"
@@ -174,27 +183,28 @@ export default function RequestForm() {
             value={formData.specialiteActuelle}
             onChange={handleChange}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            readOnly
+            className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-300 cursor-not-allowed"
           />
         </div>
         <div>
-          <label htmlFor="specialiteSouhaitee" className="block text-sm font-medium text-gray-700">Spécialité Souhaitée</label>
+          <label htmlFor="specialiteSouhaitee" className="block text-sm font-semibold text-gray-300 mb-2">Spécialité Souhaitée</label>
           <select
             id="specialiteSouhaitee"
             name="specialiteSouhaitee"
             value={formData.specialiteSouhaitee}
             onChange={handleChange}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-gray-700/70"
           >
-            <option value="">Sélectionnez une spécialité</option>
-            <option value="GL">GL - Génie Logiciel (Software Engineering)</option>
-            <option value="SECU">SECU - Sécurité (Security)</option>
-            <option value="IA">IA - Intelligence Artificielle (AI)</option>
+            <option value="" className="bg-gray-800">Sélectionnez une spécialité</option>
+            <option value="GL" className="bg-gray-800">GL - Génie Logiciel (Software Engineering)</option>
+            <option value="SECU" className="bg-gray-800">SECU - Sécurité (Security)</option>
+            <option value="IA" className="bg-gray-800">IA - Intelligence Artificielle (AI)</option>
           </select>
         </div>
         <div>
-          <label htmlFor="raison" className="block text-sm font-medium text-gray-700">Raison du Changement</label>
+          <label htmlFor="raison" className="block text-sm font-semibold text-gray-300 mb-2">Raison du Changement</label>
           <textarea
             id="raison"
             name="raison"
@@ -202,13 +212,14 @@ export default function RequestForm() {
             onChange={handleChange}
             required
             rows={4}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-gray-700/70 resize-none"
+            placeholder="Expliquez les raisons de votre demande de changement..."
           />
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center pt-4">
           <button
             type="submit"
-            className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="px-8 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold text-lg rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
             Soumettre la Demande
           </button>
