@@ -1,53 +1,136 @@
-# Site Web de Demande de Changement de Spécialité
+# Recours - USTHB Specialty Change Request System
 
-Ce projet est une application Next.js pour soumettre des demandes de changement de spécialité.
+A web application for USTHB students to request specialty changes, with an admin panel for managing requests.
 
-## Fonctionnalités
+## Features
 
-- Formulaire de demande avec les champs suivants :
-  - Nom
-  - Prénom
-  - Email
-  - Téléphone
-  - Date de naissance
-  - Adresse
-  - Spécialité actuelle
-  - Spécialité souhaitée
-  - Raison du changement
+- **Student Portal**: Submit specialty change requests
+- **Admin Panel**: Review and approve/reject requests
+- **Email Notifications**: Automatic notifications for status updates
+- **Database Integration**: PostgreSQL with Supabase
+- **Responsive Design**: Modern UI with Tailwind CSS
 
-## Technologies Utilisées
+## Tech Stack
 
-- Next.js 15
-- TypeScript
-- Tailwind CSS
-- ESLint
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: Netlify Functions (serverless)
+- **Database**: PostgreSQL (Supabase)
+- **Email**: Nodemailer with Gmail SMTP
+- **Deployment**: Netlify
 
-## Démarrage
+## Local Development
 
-Premièrement, lancez le serveur de développement :
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up environment variables in `.env.local`:
+   ```
+   DATABASE_URL=your_supabase_database_url
+   EMAIL_USER=your_gmail@gmail.com
+   EMAIL_APP_PASSWORD=your_app_password
+   ```
+4. Run development server:
+   ```bash
+   npm run dev
+   ```
 
-```bash
-npm run dev
-# ou
-yarn dev
-# ou
-pnpm dev
-# ou
-bun dev
+## Netlify Deployment
+
+### 1. Connect to Netlify
+
+1. Push your code to GitHub
+2. Go to [Netlify](https://netlify.com) and sign up/login
+3. Click "New site from Git"
+4. Connect your GitHub repository
+
+### 2. Build Settings
+
+Configure the following in Netlify:
+
+- **Build command**: `npm run build`
+- **Publish directory**: `.next` (this is handled by `netlify.toml`)
+
+### 3. Environment Variables
+
+Add these environment variables in Netlify dashboard:
+
+```
+DATABASE_URL=your_supabase_database_url
+EMAIL_USER=your_gmail@gmail.com
+EMAIL_APP_PASSWORD=your_app_password
+NODE_VERSION=18
 ```
 
-Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur pour voir le résultat.
+### 4. Database Setup
 
-Vous pouvez commencer à éditer la page en modifiant `app/page.tsx`. La page se met à jour automatiquement lorsque vous éditez le fichier.
+Make sure your Supabase database has the `requests` table:
 
-Ce projet utilise [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) pour optimiser automatiquement et charger [Geist](https://vercel.com/font), une nouvelle famille de polices pour Vercel.
+```sql
+CREATE TABLE requests (
+  id SERIAL PRIMARY KEY,
+  matricule TEXT,
+  nom TEXT,
+  prenom TEXT,
+  email TEXT,
+  telephone TEXT,
+  specialite_actuelle TEXT,
+  specialite_souhaitee TEXT,
+  raison TEXT,
+  submitted_at TIMESTAMP DEFAULT NOW(),
+  status TEXT DEFAULT 'pending',
+  admin_comment TEXT,
+  reviewed_at TIMESTAMP,
+  reviewed_by TEXT
+);
+```
 
-## En Savoir Plus
+### 5. Deploy
 
-Pour en savoir plus sur Next.js, consultez les ressources suivantes :
+Netlify will automatically build and deploy your site. The API routes will be converted to Netlify Functions.
 
-- [Documentation Next.js](https://nextjs.org/docs) - apprenez les fonctionnalités et l'API de Next.js.
-- [Apprendre Next.js](https://nextjs.org/learn) - un tutoriel interactif Next.js.
+## API Endpoints
+
+- `GET /.netlify/functions/admin-requests` - Get all requests (admin)
+- `PATCH /.netlify/functions/admin-requests-id` - Update request status
+- `POST /.netlify/functions/submit-request` - Submit new request
+- `GET /.netlify/functions/test` - Test API connectivity
+
+## Project Structure
+
+```
+├── netlify/
+│   └── functions/          # Netlify Functions
+├── public/                 # Static assets
+├── src/
+│   ├── app/               # Next.js app router
+│   │   ├── admin/         # Admin panel
+│   │   ├── api/           # API routes (converted to functions)
+│   │   └── page.tsx       # Home page
+│   └── components/        # React components
+└── netlify.toml           # Netlify configuration
+```
+
+## Email Configuration
+
+The app uses Gmail SMTP for sending emails. To set up:
+
+1. Enable 2-factor authentication on your Gmail account
+2. Generate an App Password: https://support.google.com/accounts/answer/185833
+3. Use the App Password in `EMAIL_APP_PASSWORD`
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test locally
+5. Submit a pull request
+
+## License
+
+This project is private and proprietary.
 
 Vous pouvez consulter [le dépôt GitHub Next.js](https://github.com/vercel/next.js) - vos commentaires et contributions sont les bienvenus !
 
