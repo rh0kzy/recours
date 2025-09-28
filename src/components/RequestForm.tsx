@@ -90,6 +90,13 @@ export default function RequestForm() {
   return (
     <div className="max-w-2xl mx-auto p-8 bg-gray-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50">
       <div className="text-center mb-8">
+        <div className="flex justify-center mb-6">
+          <img
+            src="/logo-usthb.png"
+            alt="Université des Sciences et de Technologie Houari Boumediene"
+            className="h-20 w-auto object-contain"
+          />
+        </div>
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
           Demande de Changement de Spécialité
         </h1>
@@ -134,7 +141,8 @@ export default function RequestForm() {
               value={formData.nom}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-gray-700/70"
+              readOnly={isStudentLoaded}
+              className={`w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${isStudentLoaded ? 'bg-gray-800/50 cursor-not-allowed text-gray-300' : 'hover:bg-gray-700/70'}`}
             />
           </div>
           <div>
@@ -146,7 +154,8 @@ export default function RequestForm() {
               value={formData.prenom}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-gray-700/70"
+              readOnly={isStudentLoaded}
+              className={`w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${isStudentLoaded ? 'bg-gray-800/50 cursor-not-allowed text-gray-300' : 'hover:bg-gray-700/70'}`}
             />
           </div>
         </div>
@@ -183,8 +192,8 @@ export default function RequestForm() {
             value={formData.specialiteActuelle}
             onChange={handleChange}
             required
-            readOnly
-            className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-300 cursor-not-allowed"
+            readOnly={isStudentLoaded}
+            className={`w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${isStudentLoaded ? 'bg-gray-800/50 cursor-not-allowed text-gray-300' : 'hover:bg-gray-700/70'}`}
           />
         </div>
         <div>
@@ -198,9 +207,15 @@ export default function RequestForm() {
             className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:bg-gray-700/70"
           >
             <option value="" className="bg-gray-800">Sélectionnez une spécialité</option>
-            <option value="GL" className="bg-gray-800">GL - Génie Logiciel (Software Engineering)</option>
-            <option value="SECU" className="bg-gray-800">SECU - Sécurité (Security)</option>
-            <option value="IA" className="bg-gray-800">IA - Intelligence Artificielle (AI)</option>
+            {formData.specialiteActuelle !== "GL" && (
+              <option value="GL" className="bg-gray-800">GL - Génie Logiciel (Software Engineering)</option>
+            )}
+            {formData.specialiteActuelle !== "SECU" && (
+              <option value="SECU" className="bg-gray-800">SECU - Sécurité (Security)</option>
+            )}
+            {formData.specialiteActuelle !== "IA" && (
+              <option value="IA" className="bg-gray-800">IA - Intelligence Artificielle (AI)</option>
+            )}
           </select>
         </div>
         <div>

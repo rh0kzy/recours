@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Client } from 'pg';
+import { sendSpecialtyChangeNotification } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   const { matricule, nom, prenom, email, telephone, specialiteActuelle, specialiteSouhaitee, raison } = await request.json();
@@ -16,7 +17,23 @@ export async function POST(request: NextRequest) {
     `;
     const values = [matricule, nom, prenom, email, telephone, specialiteActuelle, specialiteSouhaitee, raison];
     await client.query(query, values);
-    return NextResponse.json({ message: 'Request submitted successfully' });
+
+    // Send email notification
+    const emailSent = await sendSpecialtyChangeNotification({
+      matricule,
+      nom,
+      prenom,
+      email,
+      telephone,
+      specialiteActuelle,
+      specialiteSouhaitee,
+      raison,
+    });
+
+    return NextResponse.json({
+      message: 'Request submitted successfully',
+      emailSent: emailSent
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Failed to submit request' }, { status: 500 });
