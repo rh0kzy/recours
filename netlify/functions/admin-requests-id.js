@@ -76,11 +76,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Extract ID from path: /api/admin/requests/{id} -> {id}
-    const pathParts = event.path.split('/');
-    const id = pathParts[pathParts.length - 1];
-
-    const { status, adminComment, adminName } = JSON.parse(event.body);
+    const { id, status, adminComment, adminName } = JSON.parse(event.body);
 
     if (!id || !status || !['approved', 'rejected'].includes(status)) {
       return {
