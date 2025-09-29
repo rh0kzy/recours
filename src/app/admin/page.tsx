@@ -190,7 +190,7 @@ export default function AdminPage() {
                 className="h-16 w-auto"
               />
               <div>
-                <h1 className="text-3xl font-bold text-white">Administration USTHB</h1>
+                <h1 className="text-3xl font-bold text-white">Faculté Informatique - USTHB</h1>
                 <p className="text-gray-300 mt-2">Gestion des demandes de changement de spécialité</p>
               </div>
             </div>
