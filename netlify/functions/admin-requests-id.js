@@ -203,14 +203,14 @@ exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, PATCH, OPTIONS'
+    'Access-Control-Allow-Methods': 'GET, PATCH, DELETE, OPTIONS'
   };
 
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
 
-  if (event.httpMethod !== 'PATCH') {
+  if (!['PATCH', 'DELETE'].includes(event.httpMethod)) {
     return {
       statusCode: 405,
       headers,
@@ -230,6 +230,50 @@ exports.handler = async (event, context) => {
 
   let client;
   try {
+    client = new Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+
+    await client.connect();
+
+    // Handle DELETE request
+    if (event.httpMethod === 'DELETE') {
+      // Extract id from path parameters
+      const pathParts = event.path.split('/');
+      const id = parseInt(pathParts[pathParts.length - 1], 10);
+
+      if (!id || isNaN(id)) {
+        return {
+          statusCode: 400,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Invalid request ID' })
+        };
+      }
+
+      // Delete the request
+      const deleteQuery = `DELETE FROM requests WHERE id = $1 RETURNING id`;
+      const deleteResult = await client.query(deleteQuery, [id]);
+
+      if (deleteResult.rows.length === 0) {
+        return {
+          statusCode: 404,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Request not found' })
+        };
+      }
+
+      return {
+        statusCode: 200,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'Request deleted successfully',
+          deletedId: id
+        })
+      };
+    }
+
+    // Handle PATCH request
     const requestBody = JSON.parse(event.body);
     const { id, status, adminComment, adminName } = requestBody;
 
@@ -240,13 +284,6 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ error: 'Invalid request data' })
       };
     }
-
-    client = new Client({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }
-    });
-
-    await client.connect();
 
     // Update the request status
     const updateQuery = `
@@ -288,12 +325,12 @@ exports.handler = async (event, context) => {
       })
     };
   } catch (error) {
-    console.error('Update request error:', error);
+    console.error('Request operation error:', error);
     return {
       statusCode: 500,
       headers: { ...headers, 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        error: 'Failed to update request',
+        error: 'Failed to process request',
         details: error.message 
       })
     };
