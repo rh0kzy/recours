@@ -53,8 +53,9 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  const id = parseInt(params.id);
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: idParam } = await params;
+  const id = parseInt(idParam);
 
   if (!id || isNaN(id)) {
     return NextResponse.json({ error: 'Invalid request ID' }, { status: 400 });
