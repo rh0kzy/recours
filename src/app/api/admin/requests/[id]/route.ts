@@ -29,7 +29,11 @@ export async function PATCH(request: NextRequest) {
     const updateResult = await client.query(updateQuery, [status, adminComment, adminName, id]);
 
     if (updateResult.rows.length === 0) {
-      return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Request not found' }, { status: 404, headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'PATCH,DELETE,OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      } });
     }
 
     const requestData = updateResult.rows[0];
@@ -63,21 +67,32 @@ export async function PATCH(request: NextRequest) {
       ...(status === 'approved' && { 
         transferMessage: `Student automatically transferred to ${requestData.specialite_souhaitee}` 
       })
-    });
+    }, { headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    } });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Failed to update request' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to update request' }, { status: 500, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    } });
   } finally {
     await client.end();
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id: idParam } = await params;
-  const id = parseInt(idParam);
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const id = parseInt(params.id, 10);
 
   if (!id || isNaN(id)) {
-    return NextResponse.json({ error: 'Invalid request ID' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid request ID' }, { status: 400, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    } });
   }
 
   const client = new Client({
@@ -95,16 +110,28 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const deleteResult = await client.query(deleteQuery, [id]);
 
     if (deleteResult.rows.length === 0) {
-      return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Request not found' }, { status: 404, headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'PATCH,DELETE,OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      } });
     }
 
     return NextResponse.json({
       message: 'Request deleted successfully',
       deletedId: id
-    });
+    }, { headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    } });
   } catch (error) {
     console.error('Error deleting request:', error);
-    return NextResponse.json({ error: 'Failed to delete request' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete request' }, { status: 500, headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    } });
   } finally {
     await client.end();
   }
@@ -209,4 +236,16 @@ async function sendStatusUpdateNotification(data: {
     console.error('Failed to send status update email:', error);
     return false;
   }
+}
+
+export async function OPTIONS() {
+  return NextResponse.json(null, {
+    status: 204,
+    headers: {
+      Allow: 'PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    }
+  });
 }

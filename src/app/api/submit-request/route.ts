@@ -44,3 +44,16 @@ export async function POST(request: NextRequest) {
     await client.end();
   }
 }
+
+// Respond to CORS preflight requests
+export async function OPTIONS() {
+  return NextResponse.json(null, {
+    status: 204,
+    headers: {
+      Allow: 'POST,OPTIONS',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    }
+  });
+}
