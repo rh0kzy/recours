@@ -1,9 +1,13 @@
 [build]
-  publish = ".next"
   command = "npm run build"
+  functions = "netlify/functions"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "18"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 [[redirects]]
   from = "/api/health"
@@ -38,4 +42,10 @@
 [[redirects]]
   from = "/_next/static/*"
   to = "/static/:splat"
+  status = 200
+
+# Fallback for all other routes to Next.js
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
   status = 200
