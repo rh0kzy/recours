@@ -28,6 +28,8 @@ export default function AdminPage() {
   const [adminName, setAdminName] = useState('');
   const [updating, setUpdating] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedRequests, setSelectedRequests] = useState<number[]>([]);
 
   useEffect(() => {
     fetchRequests();
@@ -78,6 +80,63 @@ export default function AdminPage() {
 
   const handleRefreshClick = () => {
     fetchRequests();
+  };
+
+  const handleSelectionModeToggle = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedRequests([]);
+  };
+
+  const handleRequestSelect = (requestId: number) => {
+    setSelectedRequests(prev => 
+      prev.includes(requestId) 
+        ? prev.filter(id => id !== requestId)
+        : [...prev, requestId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRequests.length === requests.length) {
+      // If all are selected, deselect all
+      setSelectedRequests([]);
+    } else {
+      // Select all requests
+      setSelectedRequests(requests.map(request => request.id));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedRequests.length === 0) {
+      alert('Veuillez sélectionner au moins une demande à supprimer.');
+      return;
+    }
+
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${selectedRequests.length} demande(s) ?`)) {
+      return;
+    }
+
+    try {
+      const deletePromises = selectedRequests.map(id =>
+        fetch(`/api/admin/requests/${id}`, {
+          method: 'DELETE',
+        })
+      );
+
+      const results = await Promise.all(deletePromises);
+      const failedDeletes = results.filter(result => !result.ok);
+
+      if (failedDeletes.length > 0) {
+        alert(`Erreur lors de la suppression de ${failedDeletes.length} demande(s).`);
+      } else {
+        alert(`${selectedRequests.length} demande(s) supprimée(s) avec succès.`);
+        setSelectedRequests([]);
+        setSelectionMode(false);
+        fetchRequests(); // Refresh the list
+      }
+    } catch (error) {
+      console.error('Error deleting requests:', error);
+      alert('Erreur lors de la suppression des demandes.');
+    }
   };
 
   const handleRetryClick = () => {
@@ -213,15 +272,47 @@ export default function AdminPage() {
           <div className="lg:col-span-2">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
               <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-white">Demandes</h2>
-              <button
-                onClick={handleRefreshClick}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
-              >
-                <span>🔄</span>
-                Actualiser
-              </button>
-            </div>
+                <h2 className="text-xl font-semibold text-white">Demandes</h2>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleRefreshClick}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <span>🔄</span>
+                    Actualiser
+                  </button>
+                  <button
+                    onClick={handleSelectionModeToggle}
+                    className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                      selectionMode 
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                        : 'bg-gray-600 hover:bg-gray-700 text-white'
+                    }`}
+                  >
+                    <span>☑️</span>
+                    Sélectionner
+                  </button>
+                  {selectionMode && (
+                    <>
+                      <button
+                        onClick={handleSelectAll}
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                      >
+                        <span>{selectedRequests.length === requests.length ? '☑️' : '⬜'}</span>
+                        Sélectionner tout
+                      </button>
+                      <button
+                        onClick={handleDeleteSelected}
+                        disabled={selectedRequests.length === 0}
+                        className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                      >
+                        <span>🗑️</span>
+                        Supprimer ({selectedRequests.length})
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
 
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {requests.length === 0 ? (
@@ -235,24 +326,36 @@ export default function AdminPage() {
                     <div
                       key={request.id}
                       className={`p-4 rounded-lg border cursor-pointer transition-all ${
-                        selectedRequest?.id === request.id
+                        selectedRequest?.id === request.id && !selectionMode
                           ? 'bg-white/20 border-purple-400'
+                          : selectedRequests.includes(request.id) && selectionMode
+                          ? 'bg-blue-500/20 border-blue-400'
                           : 'bg-white/5 border-white/10 hover:bg-white/10'
                       }`}
-                      onClick={() => setSelectedRequest(request)}
+                      onClick={() => selectionMode ? handleRequestSelect(request.id) : setSelectedRequest(request)}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="text-white font-semibold">
-                            {request.prenom} {request.nom}
-                          </h3>
-                          <p className="text-gray-300 text-sm">Matricule: {request.matricule}</p>
+                        <div className="flex items-start gap-3">
+                          {selectionMode && (
+                            <input
+                              type="checkbox"
+                              checked={selectedRequests.includes(request.id)}
+                              onChange={() => handleRequestSelect(request.id)}
+                              className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                          )}
+                          <div>
+                            <h3 className="text-white font-semibold">
+                              {request.prenom} {request.nom}
+                            </h3>
+                            <p className="text-gray-300 text-sm">Matricule: {request.matricule}</p>
+                          </div>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
                           {getStatusText(request.status)}
                         </span>
                       </div>
-                      <div className="text-gray-300 text-sm">
+                      <div className="text-gray-300 text-sm ml-7">
                         <p>De: {request.specialite_actuelle} → Vers: {request.specialite_souhaitee}</p>
                         <p className="text-xs text-gray-400">
                           {new Date(request.created_at).toLocaleDateString('fr-FR')}

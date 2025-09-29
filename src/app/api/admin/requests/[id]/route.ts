@@ -53,6 +53,43 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const id = parseInt(params.id);
+
+  if (!id || isNaN(id)) {
+    return NextResponse.json({ error: 'Invalid request ID' }, { status: 400 });
+  }
+
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  });
+
+  try {
+    await client.connect();
+
+    // Delete the request
+    const deleteQuery = `DELETE FROM requests WHERE id = $1 RETURNING id`;
+    const deleteResult = await client.query(deleteQuery, [id]);
+
+    if (deleteResult.rows.length === 0) {
+      return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      message: 'Request deleted successfully',
+      deletedId: id
+    });
+  } catch (error) {
+    console.error('Error deleting request:', error);
+    return NextResponse.json({ error: 'Failed to delete request' }, { status: 500 });
+  } finally {
+    await client.end();
+  }
+}
+
 async function sendStatusUpdateNotification(data: {
   matricule: string;
   nom: string;
