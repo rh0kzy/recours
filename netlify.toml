@@ -38,6 +38,7 @@
   from = "/api/admin/requests/*"
   to = "/.netlify/functions/admin-requests-id"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/_next/static/*"

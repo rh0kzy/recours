@@ -1,10 +1,3 @@
-# API routes to Netlify functions
-/api/admin/requests/:id  /.netlify/functions/admin-requests-id  200
-/api/admin/requests      /.netlify/functions/admin-requests     200
-/api/submit-request      /.netlify/functions/submit-request     200
-/api/test-db             /.netlify/functions/test-db-connection 200
-/api/test-email          /.netlify/functions/test-email         200
-/api/health              /.netlify/functions/health             200
-
+# Redirects are now handled in netlify.toml
 # Catch-all for SPA
 /*    /index.html   200

@@ -204,23 +204,36 @@ exports.handler = async (event, context) => {
   console.log('Request method:', event.httpMethod);
   console.log('Request path:', event.path);
   console.log('Event body:', event.body);
+  console.log('Query parameters:', event.queryStringParameters);
+  console.log('Headers:', event.headers);
   
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, PATCH, DELETE, OPTIONS'
   };
 
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return { 
+      statusCode: 200, 
+      headers: {
+        ...headers,
+        'Access-Control-Max-Age': '86400'
+      }, 
+      body: '' 
+    };
   }
 
   if (!['PATCH', 'DELETE'].includes(event.httpMethod)) {
     console.log('Method not allowed:', event.httpMethod);
     return {
       statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        error: 'Method not allowed',
+        method: event.httpMethod,
+        allowedMethods: ['PATCH', 'DELETE', 'OPTIONS']
+      })
     };
   }
 
@@ -245,40 +258,95 @@ exports.handler = async (event, context) => {
 
     // Handle DELETE request
     if (event.httpMethod === 'DELETE') {
-      // Extract id from path parameters
+      // Extract id from path parameters or query parameters
       console.log('DELETE request path:', event.path);
+      console.log('Query parameters:', event.queryStringParameters);
+      
       const pathParts = event.path.split('/');
       console.log('Path parts:', pathParts);
-      const id = parseInt(pathParts[pathParts.length - 1], 10);
-      console.log('Parsed ID:', id);
-
+      
+      // Try to find ID from different possible locations
+      let id;
+      
+      // First, try to get ID from query parameters
+      if (event.queryStringParameters && event.queryStringParameters.id) {
+        id = parseInt(event.queryStringParameters.id, 10);
+        console.log('ID from query params:', id);
+      }
+      
+      // If not found, look for ID at the end of the path
       if (!id || isNaN(id)) {
+        const lastPart = pathParts[pathParts.length - 1];
+        id = parseInt(lastPart, 10);
+        console.log('ID from path end:', id);
+      }
+      
+      // If that didn't work, try to find it in other parts
+      if (!id || isNaN(id)) {
+        for (let i = pathParts.length - 1; i >= 0; i--) {
+          const part = pathParts[i];
+          const parsedId = parseInt(part, 10);
+          if (!isNaN(parsedId) && parsedId > 0) {
+            id = parsedId;
+            console.log('ID found in path part', i, ':', id);
+            break;
+          }
+        }
+      }
+      
+      console.log('Final parsed ID:', id);
+
+      if (!id || isNaN(id) || id <= 0) {
         console.log('Invalid ID:', id);
         return {
           statusCode: 400,
           headers: { ...headers, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Invalid request ID' })
+          body: JSON.stringify({ 
+            error: 'Invalid request ID',
+            receivedPath: event.path,
+            pathParts,
+            queryParams: event.queryStringParameters,
+            extractedId: id,
+            help: 'Expected URL format: /api/admin/requests/{id} or query parameter ?id={id}'
+          })
         };
       }
 
       // Delete the request
-      const deleteQuery = `DELETE FROM requests WHERE id = $1 RETURNING id`;
+      console.log('Attempting to delete request with ID:', id);
+      const deleteQuery = `DELETE FROM requests WHERE id = $1 RETURNING id, matricule, nom, prenom`;
       const deleteResult = await client.query(deleteQuery, [id]);
 
+      console.log('Delete query result:', deleteResult.rows);
+
       if (deleteResult.rows.length === 0) {
+        console.log('No request found with ID:', id);
         return {
           statusCode: 404,
           headers: { ...headers, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Request not found' })
+          body: JSON.stringify({ 
+            error: 'Request not found',
+            requestedId: id,
+            message: `No request exists with ID ${id}`
+          })
         };
       }
+
+      const deletedRequest = deleteResult.rows[0];
+      console.log('Successfully deleted request:', deletedRequest);
 
       return {
         statusCode: 200,
         headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: 'Request deleted successfully',
-          deletedId: id
+          deletedId: id,
+          deletedRequest: {
+            id: deletedRequest.id,
+            matricule: deletedRequest.matricule,
+            nom: deletedRequest.nom,
+            prenom: deletedRequest.prenom
+          }
         })
       };
     }
