@@ -27,27 +27,61 @@ export default function AdminPage() {
   const [adminComment, setAdminComment] = useState('');
   const [adminName, setAdminName] = useState('');
   const [updating, setUpdating] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     fetchRequests();
   }, []);
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (retry = false) => {
     try {
       setError(null);
+      if (!retry) {
+        setLoading(true);
+      }
+      
       const response = await fetch('/api/admin/requests');
+      
       if (response.ok) {
         const data = await response.json();
         setRequests(data);
+        setRetryCount(0); // Reset retry count on success
       } else {
-        setError('Erreur lors du chargement des demandes');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || `Erreur HTTP ${response.status}`;
+        
+        console.error('Admin requests error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        
+        setError(`Erreur lors du chargement des demandes: ${errorMessage}`);
+        
+        // If it's a server error and we haven't retried too many times, suggest retry
+        if (response.status >= 500 && retryCount < 3) {
+          setError(`${errorMessage} (Tentative ${retryCount + 1}/3)`);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch requests:', error);
-      setError('Erreur de connexion à la base de données');
+      setError('Erreur de connexion à la base de données. Vérifiez votre connexion internet.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const retryFetchRequests = async () => {
+    setRetryCount(prev => prev + 1);
+    await fetchRequests(true);
+  };
+
+  const handleRefreshClick = () => {
+    fetchRequests();
+  };
+
+  const handleRetryClick = () => {
+    retryFetchRequests();
   };
 
   const updateRequestStatus = async (id: number, status: 'approved' | 'rejected') => {
@@ -121,12 +155,23 @@ export default function AdminPage() {
           <div className="text-red-400 text-6xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold text-white mb-4">Erreur de chargement</h2>
           <p className="text-gray-300 mb-6">{error}</p>
-          <button
-            onClick={fetchRequests}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            Réessayer
-          </button>
+          <div className="space-y-3">
+            <button
+              onClick={handleRetryClick}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              disabled={retryCount >= 3}
+            >
+              {retryCount >= 3 ? 'Limite de tentatives atteinte' : `Réessayer (${retryCount + 1}/3)`}
+            </button>
+            {retryCount >= 3 && (
+              <button
+                onClick={handleRefreshClick}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                Actualiser la page
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -163,7 +208,7 @@ export default function AdminPage() {
               <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-white">Demandes</h2>
               <button
-                onClick={fetchRequests}
+                onClick={handleRefreshClick}
                 className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
               >
                 <span>🔄</span>

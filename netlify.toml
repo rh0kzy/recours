@@ -6,6 +6,16 @@
   NODE_VERSION = "18"
 
 [[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+[[redirects]]
+  from = "/api/test-db-connection"
+  to = "/.netlify/functions/test-db-connection"
+  status = 200
+
+[[redirects]]
   from = "/api/setup-database"
   to = "/.netlify/functions/setup-database"
   status = 200
