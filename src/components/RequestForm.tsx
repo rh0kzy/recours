@@ -177,6 +177,18 @@ export default function RequestForm() {
       </div>
 
       <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8 bg-gray-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50">
+      {/* Bouton Admin dans le coin supérieur droit */}
+      <div className="flex justify-end mb-4">
+        <a
+          href="/admin"
+          className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg border border-gray-600/50"
+        >
+          <span className="text-base">⚙️</span>
+          <span className="hidden sm:inline">Administration</span>
+          <span className="sm:hidden">Admin</span>
+        </a>
+      </div>
+      
       <div className="text-center mb-6 sm:mb-8">
         <div className="flex justify-center mb-4 sm:mb-6">
           <img

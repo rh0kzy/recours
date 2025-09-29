@@ -629,11 +629,9 @@ export default function AdminPage() {
                           <span className="hidden sm:inline">De: {request.specialite_actuelle} → Vers: {request.specialite_souhaitee}</span>
                           <span className="sm:hidden">{request.specialite_actuelle} → {request.specialite_souhaitee}</span>
                         </p>
-                        <p className="text-xs text-gray-400">
-                                                  <div className="text-xs text-gray-400 mt-1">
+                        <div className="text-xs text-gray-400 mt-1">
                           {formatDate(request.created_at)}
                         </div>
-                        </p>
                       </div>
                     </div>
                   ))
