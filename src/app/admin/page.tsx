@@ -444,6 +444,15 @@ export default function AdminPage() {
                               />
                             </div>
                           )}
+                          {!selectionMode && (
+                            <div className="flex items-center justify-center flex-shrink-0">
+                              <img
+                                src="/logo-usthb.png"
+                                alt="USTHB"
+                                className="h-8 w-8 sm:h-10 sm:w-10 object-contain opacity-80"
+                              />
+                            </div>
+                          )}
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <h3 className="text-white font-semibold text-sm sm:text-base truncate">
