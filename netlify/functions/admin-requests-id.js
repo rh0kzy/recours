@@ -382,6 +382,22 @@ exports.handler = async (event, context) => {
 
     const requestData = updateResult.rows[0];
 
+    // If approved, automatically transfer student to new specialty
+    if (status === 'approved') {
+      try {
+        const transferQuery = `
+          UPDATE students
+          SET specialite = $1
+          WHERE matricule = $2
+        `;
+        await client.query(transferQuery, [requestData.specialite_souhaitee, requestData.matricule]);
+        console.log(`Student ${requestData.matricule} transferred to specialty: ${requestData.specialite_souhaitee}`);
+      } catch (transferError) {
+        console.error('Error transferring student to new specialty:', transferError);
+        // Continue with the process even if transfer fails, but log the error
+      }
+    }
+
     // Send notification email
     let emailSent = false;
     try {
