@@ -39,6 +39,13 @@ export default function AdminPage() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedRequests, setSelectedRequests] = useState<number[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteConfirmationData, setDeleteConfirmationData] = useState<{
+    count: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+  } | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -211,18 +218,20 @@ export default function AdminPage() {
     const approvedCount = selectedRequestsData.filter(r => r.status === 'approved').length;
     const rejectedCount = selectedRequestsData.filter(r => r.status === 'rejected').length;
 
-    let confirmMessage = `Êtes-vous sûr de vouloir supprimer définitivement ${selectedRequests.length} demande(s) ?\n\n`;
-    confirmMessage += `Détails :\n`;
-    if (pendingCount > 0) confirmMessage += `• ${pendingCount} demande(s) en attente\n`;
-    if (approvedCount > 0) confirmMessage += `• ${approvedCount} demande(s) approuvée(s)\n`;
-    if (rejectedCount > 0) confirmMessage += `• ${rejectedCount} demande(s) rejetée(s)\n`;
-    confirmMessage += `\n⚠️ Cette action est irréversible !`;
+    // Prepare confirmation data and show modal
+    setDeleteConfirmationData({
+      count: selectedRequests.length,
+      pending: pendingCount,
+      approved: approvedCount,
+      rejected: rejectedCount
+    });
+    setShowDeleteConfirmation(true);
+  };
 
-    if (!confirm(confirmMessage)) {
-      return;
-    }
-
+  const confirmDelete = async () => {
     try {
+      setShowDeleteConfirmation(false);
+      
       const deletePromises = selectedRequests.map(id =>
         fetch(`/api/admin/requests/${id}`, {
           method: 'DELETE',
@@ -243,7 +252,14 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error deleting requests:', error);
       showError('Erreur de suppression', 'Erreur lors de la suppression des demandes.');
+    } finally {
+      setDeleteConfirmationData(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirmation(false);
+    setDeleteConfirmationData(null);
   };
 
   const handleRetryClick = () => {
@@ -772,6 +788,89 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de confirmation de suppression */}
+      {showDeleteConfirmation && deleteConfirmationData && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl border border-red-500/30 max-w-md w-full transform transition-all duration-300 ease-out scale-100">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                  <span className="text-2xl">⚠️</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Confirmation de suppression</h3>
+                  <p className="text-sm text-gray-400">Cette action est irréversible</p>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="mb-6">
+                <p className="text-white mb-3">
+                  Êtes-vous sûr de vouloir supprimer définitivement{' '}
+                  <span className="font-semibold text-red-400">
+                    {deleteConfirmationData.count} demande(s)
+                  </span> ?
+                </p>
+
+                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                  <p className="text-sm font-medium text-gray-300 mb-2">Détails :</p>
+                  <div className="space-y-1 text-sm">
+                    {deleteConfirmationData.pending > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                        <span className="text-gray-300">
+                          {deleteConfirmationData.pending} demande(s) en attente
+                        </span>
+                      </div>
+                    )}
+                    {deleteConfirmationData.approved > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                        <span className="text-gray-300">
+                          {deleteConfirmationData.approved} demande(s) approuvée(s)
+                        </span>
+                      </div>
+                    )}
+                    {deleteConfirmationData.rejected > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                        <span className="text-gray-300">
+                          {deleteConfirmationData.rejected} demande(s) rejetée(s)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                  <div className="flex items-center gap-2">
+                    <span className="text-red-400">⚠️</span>
+                    <span className="text-red-300 text-sm font-medium">Cette action est irréversible !</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDelete}
+                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg transition-colors font-medium"
+                >
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
