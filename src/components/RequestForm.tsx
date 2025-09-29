@@ -151,8 +151,8 @@ export default function RequestForm() {
               value={formData.nom}
               onChange={handleChange}
               required
-              readOnly={isStudentLoaded}
-              className={`w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${isStudentLoaded ? 'bg-gray-800/50 cursor-not-allowed text-gray-300' : 'hover:bg-gray-700/70'}`}
+              readOnly
+              className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-300 cursor-not-allowed focus:outline-none"
             />
           </div>
           <div>
@@ -164,8 +164,8 @@ export default function RequestForm() {
               value={formData.prenom}
               onChange={handleChange}
               required
-              readOnly={isStudentLoaded}
-              className={`w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${isStudentLoaded ? 'bg-gray-800/50 cursor-not-allowed text-gray-300' : 'hover:bg-gray-700/70'}`}
+              readOnly
+              className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-300 cursor-not-allowed focus:outline-none"
             />
           </div>
         </div>
@@ -202,8 +202,8 @@ export default function RequestForm() {
             value={formData.specialiteActuelle}
             onChange={handleChange}
             required
-            readOnly={isStudentLoaded}
-            className={`w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${isStudentLoaded ? 'bg-gray-800/50 cursor-not-allowed text-gray-300' : 'hover:bg-gray-700/70'}`}
+            readOnly
+            className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-gray-300 cursor-not-allowed focus:outline-none"
           />
         </div>
         <div>
