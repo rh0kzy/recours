@@ -183,9 +183,16 @@ export default function AdminPage() {
       <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">Administration USTHB</h1>
-              <p className="text-gray-300 mt-2">Gestion des demandes de changement de spécialité</p>
+            <div className="flex items-center gap-4">
+              <img
+                src="/logo-usthb.png"
+                alt="Université des Sciences et de Technologie Houari Boumediene"
+                className="h-16 w-auto"
+              />
+              <div>
+                <h1 className="text-3xl font-bold text-white">Administration USTHB</h1>
+                <p className="text-gray-300 mt-2">Gestion des demandes de changement de spécialité</p>
+              </div>
             </div>
             <div className="text-right">
               <p className="text-white font-semibold">Total: {requests.length}</p>
