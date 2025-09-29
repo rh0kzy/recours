@@ -307,85 +307,89 @@ export default function AdminPage() {
           {/* Requests List */}
           <div className="xl:col-span-2">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-lg sm:text-xl font-semibold text-white">Demandes</h2>
-                  {selectionMode && (
-                    <div className="bg-blue-500/20 px-3 py-1 rounded-full">
-                      <span className="text-blue-300 text-sm font-medium">
-                        {selectedRequests.length} sélectionnée(s)
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                  {/* Boutons de contrôle principal */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleRefreshClick}
-                      disabled={selectionMode}
-                      className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
-                    >
-                      <span className="text-lg">🔄</span>
-                      <span>Actualiser</span>
-                    </button>
-                    
-                    <button
-                      onClick={handleSelectionModeToggle}
-                      className={`px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 ${
-                        selectionMode 
-                          ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white ring-2 ring-blue-400/50' 
-                          : 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white'
-                      }`}
-                    >
-                      <span className="text-lg">{selectionMode ? '✅' : '☑️'}</span>
-                      <span className="hidden sm:inline">
-                        {selectionMode ? 'Annuler sélection' : 'Mode sélection'}
-                      </span>
-                      <span className="sm:hidden">
-                        {selectionMode ? 'Annuler' : 'Sélect.'}
-                      </span>
-                    </button>
-                  </div>
-                  
-                  {/* Boutons de sélection et suppression */}
-                  {selectionMode && (
-                    <div className="flex gap-2 border-l border-white/20 pl-3">
-                      <button
-                        onClick={handleSelectAll}
-                        className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
-                      >
-                        <span className="text-lg">{
-                          requests.every(r => selectedRequests.includes(r.id)) 
-                          && requests.length > 0
-                          ? '☑️' : '⬜'
-                        }</span>
-                        <span className="hidden sm:inline">
-                          {requests.every(r => selectedRequests.includes(r.id)) && requests.length > 0 
-                            ? 'Désélectionner tout' : 'Tout sélectionner'}
+              <div className="flex flex-col gap-4 mb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-lg sm:text-xl font-semibold text-white">Demandes</h2>
+                    {selectionMode && (
+                      <div className="bg-blue-500/20 px-3 py-1 rounded-full">
+                        <span className="text-blue-300 text-sm font-medium">
+                          {selectedRequests.length} sélectionnée(s)
                         </span>
-                        <span className="sm:hidden">Tout</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Boutons de contrôle intégrés dans la carte */}
+                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                  <div className="flex flex-col sm:flex-row gap-3 w-full">
+                    {/* Boutons de contrôle principal */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleRefreshClick}
+                        disabled={selectionMode}
+                        className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+                      >
+                        <span className="text-lg">🔄</span>
+                        <span>Actualiser</span>
                       </button>
                       
                       <button
-                        onClick={handleDeleteSelected}
-                        disabled={selectedRequests.length === 0}
-                        className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+                        onClick={handleSelectionModeToggle}
+                        className={`px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                          selectionMode 
+                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white ring-2 ring-blue-400/50' 
+                            : 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white'
+                        }`}
                       >
-                        <span className="text-lg">🗑️</span>
+                        <span className="text-lg">{selectionMode ? '✅' : '☑️'}</span>
                         <span className="hidden sm:inline">
-                          {selectedRequests.length > 0 ? `Supprimer (${selectedRequests.length})` : 'Supprimer sélection'}
+                          {selectionMode ? 'Annuler sélection' : 'Mode sélection'}
                         </span>
                         <span className="sm:hidden">
-                          {selectedRequests.length > 0 ? `Sup. (${selectedRequests.length})` : 'Sup.'}
+                          {selectionMode ? 'Annuler' : 'Sélect.'}
                         </span>
                       </button>
                     </div>
-                  )}
+                    
+                    {/* Boutons de sélection et suppression */}
+                    {selectionMode && (
+                      <div className="flex gap-2 border-l border-white/20 pl-3">
+                        <button
+                          onClick={handleSelectAll}
+                          className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                        >
+                          <span className="text-lg">{
+                            requests.every(r => selectedRequests.includes(r.id)) 
+                            && requests.length > 0
+                            ? '☑️' : '⬜'
+                          }</span>
+                          <span className="hidden sm:inline">
+                            {requests.every(r => selectedRequests.includes(r.id)) && requests.length > 0 
+                              ? 'Désélectionner tout' : 'Tout sélectionner'}
+                          </span>
+                          <span className="sm:hidden">Tout</span>
+                        </button>
+                        
+                        <button
+                          onClick={handleDeleteSelected}
+                          disabled={selectedRequests.length === 0}
+                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+                        >
+                          <span className="text-lg">🗑️</span>
+                          <span className="hidden sm:inline">
+                            {selectedRequests.length > 0 ? `Supprimer (${selectedRequests.length})` : 'Supprimer sélection'}
+                          </span>
+                          <span className="sm:hidden">
+                            {selectedRequests.length > 0 ? `Sup. (${selectedRequests.length})` : 'Sup.'}
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              <div className="space-y-3 sm:space-y-4 max-h-96 sm:max-h-[500px] overflow-y-auto">
+              </div>              <div className="space-y-3 sm:space-y-4 max-h-96 sm:max-h-[500px] overflow-y-auto">
                 {selectionMode && (
                   <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
                     <div className="flex items-start gap-3">
