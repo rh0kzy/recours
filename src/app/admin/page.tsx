@@ -103,56 +103,48 @@ export default function AdminPage() {
   };
 
   const handleSelectAll = () => {
-    const pendingRequests = requests.filter(r => r.status === 'pending');
-    const allPendingSelected = pendingRequests.every(request => 
+    const allRequestsSelected = requests.every(request => 
       selectedRequests.includes(request.id)
     );
     
-    if (allPendingSelected && pendingRequests.length > 0) {
-      // Deselect all pending requests
-      setSelectedRequests(prev => 
-        prev.filter(id => !pendingRequests.find(r => r.id === id))
-      );
+    if (allRequestsSelected && requests.length > 0) {
+      // Deselect all requests
+      setSelectedRequests([]);
     } else {
-      // Select all pending requests (only pending can be deleted)
-      const pendingIds = pendingRequests.map(r => r.id);
-      setSelectedRequests(prev => {
-        const newSelection = [...prev];
-        pendingIds.forEach(id => {
-          if (!newSelection.includes(id)) {
-            newSelection.push(id);
-          }
-        });
-        return newSelection;
-      });
+      // Select all requests (all statuses)
+      const allIds = requests.map(r => r.id);
+      setSelectedRequests(allIds);
     }
   };
 
   const handleDeleteSelected = async () => {
-    // Filter to only delete pending requests
-    const pendingSelectedRequests = selectedRequests.filter(id => {
-      const request = requests.find(r => r.id === id);
-      return request && request.status === 'pending';
-    });
-
-    if (pendingSelectedRequests.length === 0) {
-      alert('Veuillez sélectionner au moins une demande en attente à supprimer.\nNote: Seules les demandes en attente peuvent être supprimées.');
+    if (selectedRequests.length === 0) {
+      alert('Veuillez sélectionner au moins une demande à supprimer.');
       return;
     }
 
-    const nonPendingCount = selectedRequests.length - pendingSelectedRequests.length;
-    let confirmMessage = `Êtes-vous sûr de vouloir supprimer ${pendingSelectedRequests.length} demande(s) en attente ?`;
-    
-    if (nonPendingCount > 0) {
-      confirmMessage += `\n\nNote: ${nonPendingCount} demande(s) déjà traitée(s) ne seront pas supprimées.`;
-    }
+    // Categorize selected requests by status
+    const selectedRequestsData = selectedRequests.map(id => 
+      requests.find(r => r.id === id)
+    ).filter((r): r is Request => r !== undefined);
+
+    const pendingCount = selectedRequestsData.filter(r => r.status === 'pending').length;
+    const approvedCount = selectedRequestsData.filter(r => r.status === 'approved').length;
+    const rejectedCount = selectedRequestsData.filter(r => r.status === 'rejected').length;
+
+    let confirmMessage = `Êtes-vous sûr de vouloir supprimer définitivement ${selectedRequests.length} demande(s) ?\n\n`;
+    confirmMessage += `Détails :\n`;
+    if (pendingCount > 0) confirmMessage += `• ${pendingCount} demande(s) en attente\n`;
+    if (approvedCount > 0) confirmMessage += `• ${approvedCount} demande(s) approuvée(s)\n`;
+    if (rejectedCount > 0) confirmMessage += `• ${rejectedCount} demande(s) rejetée(s)\n`;
+    confirmMessage += `\n⚠️ Cette action est irréversible !`;
 
     if (!confirm(confirmMessage)) {
       return;
     }
 
     try {
-      const deletePromises = pendingSelectedRequests.map(id =>
+      const deletePromises = selectedRequests.map(id =>
         fetch(`/api/admin/requests/${id}`, {
           method: 'DELETE',
         })
@@ -164,7 +156,7 @@ export default function AdminPage() {
       if (failedDeletes.length > 0) {
         alert(`Erreur lors de la suppression de ${failedDeletes.length} demande(s).`);
       } else {
-        alert(`${pendingSelectedRequests.length} demande(s) supprimée(s) avec succès.`);
+        alert(`${selectedRequests.length} demande(s) supprimée(s) avec succès.`);
         setSelectedRequests([]);
         setSelectionMode(false);
         fetchRequests(); // Refresh the list
@@ -326,77 +318,89 @@ export default function AdminPage() {
                     </div>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                  <button
-                    onClick={handleRefreshClick}
-                    disabled={selectionMode}
-                    className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
-                  >
-                    <span>🔄</span>
-                    <span>Actualiser</span>
-                  </button>
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                  {/* Boutons de contrôle principal */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleRefreshClick}
+                      disabled={selectionMode}
+                      className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+                    >
+                      <span className="text-lg">🔄</span>
+                      <span>Actualiser</span>
+                    </button>
+                    
+                    <button
+                      onClick={handleSelectionModeToggle}
+                      className={`px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                        selectionMode 
+                          ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white ring-2 ring-blue-400/50' 
+                          : 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white'
+                      }`}
+                    >
+                      <span className="text-lg">{selectionMode ? '✅' : '☑️'}</span>
+                      <span className="hidden sm:inline">
+                        {selectionMode ? 'Annuler sélection' : 'Mode sélection'}
+                      </span>
+                      <span className="sm:hidden">
+                        {selectionMode ? 'Annuler' : 'Sélect.'}
+                      </span>
+                    </button>
+                  </div>
                   
-                  <button
-                    onClick={handleSelectionModeToggle}
-                    className={`px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base ${
-                      selectionMode 
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white ring-2 ring-blue-400' 
-                        : 'bg-gray-600 hover:bg-gray-700 text-white'
-                    }`}
-                  >
-                    <span>{selectionMode ? '✅' : '☑️'}</span>
-                    <span className="hidden sm:inline">
-                      {selectionMode ? 'Annuler' : 'Sélectionner'}
-                    </span>
-                    <span className="sm:hidden">
-                      {selectionMode ? 'Annuler' : 'Sélect.'}
-                    </span>
-                  </button>
-                  
+                  {/* Boutons de sélection et suppression */}
                   {selectionMode && (
-                    <>
+                    <div className="flex gap-2 border-l border-white/20 pl-3">
                       <button
                         onClick={handleSelectAll}
-                        className="bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
+                        className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
                       >
-                        <span>{
-                          requests.filter(r => r.status === 'pending').every(r => selectedRequests.includes(r.id)) 
-                          && requests.filter(r => r.status === 'pending').length > 0
+                        <span className="text-lg">{
+                          requests.every(r => selectedRequests.includes(r.id)) 
+                          && requests.length > 0
                           ? '☑️' : '⬜'
                         }</span>
-                        <span className="hidden sm:inline">Tout sélectionner</span>
+                        <span className="hidden sm:inline">
+                          {requests.every(r => selectedRequests.includes(r.id)) && requests.length > 0 
+                            ? 'Désélectionner tout' : 'Tout sélectionner'}
+                        </span>
                         <span className="sm:hidden">Tout</span>
                       </button>
                       
                       <button
                         onClick={handleDeleteSelected}
                         disabled={selectedRequests.length === 0}
-                        className="bg-red-600 hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
+                        className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
                       >
-                        <span>🗑️</span>
+                        <span className="text-lg">🗑️</span>
                         <span className="hidden sm:inline">
-                          {selectedRequests.length > 0 ? `Supprimer (${selectedRequests.length})` : 'Supprimer'}
+                          {selectedRequests.length > 0 ? `Supprimer (${selectedRequests.length})` : 'Supprimer sélection'}
                         </span>
                         <span className="sm:hidden">
-                          {selectedRequests.length > 0 ? `(${selectedRequests.length})` : 'Sup.'}
+                          {selectedRequests.length > 0 ? `Sup. (${selectedRequests.length})` : 'Sup.'}
                         </span>
                       </button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
 
               <div className="space-y-3 sm:space-y-4 max-h-96 sm:max-h-[500px] overflow-y-auto">
                 {selectionMode && (
-                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 mb-4">
-                    <div className="flex items-start gap-2">
-                      <span className="text-blue-400 text-lg">ℹ️</span>
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
+                    <div className="flex items-start gap-3">
+                      <span className="text-blue-400 text-xl">ℹ️</span>
                       <div>
-                        <p className="text-blue-300 text-sm font-medium">Mode de sélection activé</p>
+                        <p className="text-blue-300 text-sm font-semibold">Mode de sélection activé</p>
                         <p className="text-blue-200/80 text-xs mt-1">
-                          Seules les demandes en attente peuvent être sélectionnées pour suppression.
-                          Les demandes déjà traitées ne peuvent pas être supprimées.
+                          Vous pouvez maintenant sélectionner et supprimer toutes les demandes, 
+                          quel que soit leur statut (en attente, approuvées ou rejetées).
                         </p>
+                        {selectedRequests.length > 0 && (
+                          <div className="mt-2 text-xs text-blue-300">
+                            <span className="font-medium">{selectedRequests.length} demande(s) sélectionnée(s)</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -437,7 +441,6 @@ export default function AdminPage() {
                                 checked={selectedRequests.includes(request.id)}
                                 onChange={() => {}} // Controlled by parent click
                                 className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 flex-shrink-0 cursor-pointer"
-                                disabled={request.status !== 'pending'} // Only pending requests can be selected for deletion
                               />
                             </div>
                           )}
@@ -482,10 +485,19 @@ export default function AdminPage() {
           <div className="xl:col-span-1">
             {selectedRequest ? (
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-                <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">
-                  <span className="hidden sm:inline">Détails de la demande</span>
-                  <span className="sm:hidden">Détails</span>
-                </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg sm:text-xl font-semibold text-white">
+                    <span className="hidden sm:inline">Détails de la demande</span>
+                    <span className="sm:hidden">Détails</span>
+                  </h2>
+                  <button
+                    onClick={() => setSelectedRequest(null)}
+                    className="bg-gray-600/50 hover:bg-gray-600 text-gray-300 hover:text-white p-2 rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
+                    title="Fermer"
+                  >
+                    <span className="text-lg">×</span>
+                  </button>
+                </div>
 
                 <div className="space-y-3 sm:space-y-4">
                   <div>
@@ -547,33 +559,39 @@ export default function AdminPage() {
                         />
                       </div>
 
-                      <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <button
                           onClick={() => updateRequestStatus(selectedRequest.id, 'approved')}
                           disabled={updating}
-                          className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+                          className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
                         >
                           {updating ? (
                             <>
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                              Traitement...
+                              <span>Traitement...</span>
                             </>
                           ) : (
-                            'Approuver'
+                            <>
+                              <span className="text-lg">✅</span>
+                              <span>Approuver</span>
+                            </>
                           )}
                         </button>
                         <button
                           onClick={() => updateRequestStatus(selectedRequest.id, 'rejected')}
                           disabled={updating}
-                          className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+                          className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
                         >
                           {updating ? (
                             <>
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                              Traitement...
+                              <span>Traitement...</span>
                             </>
                           ) : (
-                            'Refuser'
+                            <>
+                              <span className="text-lg">❌</span>
+                              <span>Refuser</span>
+                            </>
                           )}
                         </button>
                       </div>
