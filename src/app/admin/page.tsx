@@ -73,6 +73,47 @@ export default function AdminPage() {
   const showInfo = (title: string, message: string) => addNotification('info', title, message);
   const showWarning = (title: string, message: string) => addNotification('warning', title, message);
 
+  // Fonction utilitaire pour formater les dates
+  const formatDate = (dateString: string | null | undefined): string => {
+    if (!dateString) return 'N/A';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Date invalide';
+      }
+      return date.toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    } catch (error) {
+      console.error('Erreur de formatage de date:', error);
+      return 'Date invalide';
+    }
+  };
+
+  const formatDateTime = (dateString: string | null | undefined): string => {
+    if (!dateString) return 'N/A';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Date invalide';
+      }
+      return date.toLocaleString('fr-FR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Erreur de formatage de date/heure:', error);
+      return 'Date invalide';
+    }
+  };
+
   const fetchRequests = async (retry = false) => {
     try {
       setError(null);
@@ -573,7 +614,9 @@ export default function AdminPage() {
                           <span className="sm:hidden">{request.specialite_actuelle} → {request.specialite_souhaitee}</span>
                         </p>
                         <p className="text-xs text-gray-400">
-                          {new Date(request.created_at).toLocaleDateString('fr-FR')}
+                                                  <div className="text-xs text-gray-400 mt-1">
+                          {formatDate(request.created_at)}
+                        </div>
                         </p>
                       </div>
                     </div>
@@ -704,7 +747,7 @@ export default function AdminPage() {
                     <div className="pt-4 border-t border-white/20">
                       <div className="text-xs sm:text-sm text-gray-400 space-y-1">
                         <p>Traité par: {selectedRequest.reviewed_by}</p>
-                        <p>Le: {selectedRequest.reviewed_at ? new Date(selectedRequest.reviewed_at).toLocaleString('fr-FR') : 'N/A'}</p>
+                        <p>Le: {formatDateTime(selectedRequest.reviewed_at)}</p>
                         {selectedRequest.admin_comment && (
                           <div className="mt-2 p-2 bg-white/5 rounded">
                             <p className="text-gray-300 break-words">Commentaire: {selectedRequest.admin_comment}</p>

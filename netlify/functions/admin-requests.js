@@ -86,7 +86,7 @@ exports.handler = async (event, context) => {
         COALESCE(raison, '') as raison,
         COALESCE(status, 'pending') as status, 
         COALESCE(admin_comment, '') as admin_comment, 
-        submitted_at, 
+        submitted_at as created_at, 
         reviewed_at, 
         COALESCE(reviewed_by, '') as reviewed_by
       FROM requests
