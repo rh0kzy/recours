@@ -43,7 +43,7 @@ const sendAdminNotification = async (requestData) => {
     `;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"USTHB - Administration" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER, // Send to admin
       subject: 'Nouvelle demande de changement de spécialité',
       html
@@ -133,10 +133,15 @@ const sendStudentConfirmation = async (requestData) => {
     `;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"USTHB - Système de Demandes" <${process.env.EMAIL_USER}>`,
       to: requestData.email, // Send to student
       subject: 'Confirmation de demande de changement de spécialité - USTHB',
-      html
+      html,
+      headers: {
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+        'Importance': 'high'
+      }
     });
 
     return true;

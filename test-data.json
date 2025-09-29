@@ -1,0 +1,10 @@
+{
+  "matricule": "TEST123",
+  "nom": "Test",
+  "prenom": "User",
+  "email": "test@gmail.com",
+  "telephone": "0123456789",
+  "specialiteActuelle": "Informatique",
+  "specialiteSouhaitee": "Génie Logiciel",
+  "raison": "Test email functionality"
+}
