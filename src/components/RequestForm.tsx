@@ -139,7 +139,7 @@ export default function RequestForm() {
   return (
     <>
       {/* Système de notifications */}
-      <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm">
+      <div className="fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50 space-y-3 max-w-sm sm:max-w-sm mx-auto sm:mx-0">
         {notifications.map((notification) => (
           <div
             key={notification.id}
@@ -176,28 +176,29 @@ export default function RequestForm() {
         ))}
       </div>
 
-      <div className="max-w-2xl mx-auto p-8 bg-gray-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50">
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-6">
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8 bg-gray-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50">
+      <div className="text-center mb-6 sm:mb-8">
+        <div className="flex justify-center mb-4 sm:mb-6">
           <img
             src="/logo-usthb.png"
             alt="Université des Sciences et de Technologie Houari Boumediene"
-            className="h-20 w-auto object-contain"
+            className="h-16 sm:h-20 w-auto object-contain"
           />
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
-          Demande de Changement de Spécialité
+        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
+          <span className="hidden sm:inline">Demande de Changement de Spécialité</span>
+          <span className="sm:hidden">Changement de Spécialité</span>
         </h1>
         <p className="text-gray-400 text-sm">
           Remplissez ce formulaire pour demander un changement de spécialité
         </p>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         <div>
           <label htmlFor="matricule" className="block text-sm font-semibold text-gray-300 mb-2">
             Matricule
           </label>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               id="matricule"
@@ -213,13 +214,14 @@ export default function RequestForm() {
               type="button"
               onClick={handleLookup}
               disabled={isStudentLoaded}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
+              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
             >
-              Rechercher
+              <span className="hidden sm:inline">Rechercher</span>
+              <span className="sm:hidden">🔍 Rechercher</span>
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div>
             <label htmlFor="nom" className="block text-sm font-semibold text-gray-300 mb-2">Nom</label>
             <input
@@ -322,9 +324,10 @@ export default function RequestForm() {
         <div className="flex justify-center pt-4">
           <button
             type="submit"
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold text-lg rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold text-base sm:text-lg rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            Soumettre la Demande
+            <span className="hidden sm:inline">Soumettre la Demande</span>
+            <span className="sm:hidden">📝 Soumettre</span>
           </button>
         </div>
       </form>

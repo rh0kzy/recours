@@ -318,7 +318,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Système de notifications */}
-      <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm">
+      <div className="fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50 space-y-3 max-w-sm sm:max-w-sm mx-auto sm:mx-0">
         {notifications.map((notification) => (
           <div
             key={notification.id}
