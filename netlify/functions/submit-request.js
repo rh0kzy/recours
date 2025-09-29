@@ -13,6 +13,12 @@ const createTransporter = () => {
 
 const sendSpecialtyChangeNotification = async (requestData) => {
   try {
+    // Check if email configuration is available
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
+      console.warn('Email configuration missing, skipping email notification');
+      return false;
+    }
+
     const transporter = createTransporter();
 
     const html = `
@@ -69,10 +75,31 @@ exports.handler = async (event, context) => {
     };
   }
 
-  try {
-    const { matricule, nom, prenom, email, telephone, specialiteActuelle, specialiteSouhaitee, raison } = JSON.parse(event.body);
+  // Check for required environment variables
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL environment variable is missing');
+    return {
+      statusCode: 500,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Database configuration missing' })
+    };
+  }
 
-    const client = new Client({
+  let client;
+  try {
+    const requestBody = JSON.parse(event.body);
+    const { matricule, nom, prenom, email, telephone, specialiteActuelle, specialiteSouhaitee, raison } = requestBody;
+
+    // Validate required fields
+    if (!matricule || !nom || !prenom || !email || !specialiteActuelle || !specialiteSouhaitee) {
+      return {
+        statusCode: 400,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Missing required fields' })
+      };
+    }
+
+    client = new Client({
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false }
     });
@@ -84,21 +111,24 @@ exports.handler = async (event, context) => {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `;
     const values = [matricule, nom, prenom, email, telephone, specialiteActuelle, specialiteSouhaitee, raison];
-    await client.query(query);
-
-    await client.end();
+    await client.query(query, values);
 
     // Send email notification
-    const emailSent = await sendSpecialtyChangeNotification({
-      matricule,
-      nom,
-      prenom,
-      email,
-      telephone,
-      specialiteActuelle,
-      specialiteSouhaitee,
-      raison,
-    });
+    let emailSent = false;
+    try {
+      emailSent = await sendSpecialtyChangeNotification({
+        matricule,
+        nom,
+        prenom,
+        email,
+        telephone,
+        specialiteActuelle,
+        specialiteSouhaitee,
+        raison,
+      });
+    } catch (emailError) {
+      console.error('Email sending failed but continuing:', emailError);
+    }
 
     return {
       statusCode: 200,
@@ -113,7 +143,18 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers: { ...headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Failed to submit request' })
+      body: JSON.stringify({ 
+        error: 'Failed to submit request',
+        details: error.message 
+      })
     };
+  } finally {
+    if (client) {
+      try {
+        await client.end();
+      } catch (closeError) {
+        console.error('Error closing database connection:', closeError);
+      }
+    }
   }
 };

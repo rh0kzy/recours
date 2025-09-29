@@ -40,6 +40,7 @@ export default function RequestForm() {
 
     try {
       const response = await fetch(`/api/student?matricule=${encodeURIComponent(formData.matricule)}`);
+      
       if (response.ok) {
         const studentData = await response.json();
         setFormData(prev => ({ ...prev, ...studentData }));
@@ -47,11 +48,14 @@ export default function RequestForm() {
       } else if (response.status === 404) {
         alert('Étudiant non trouvé avec ce matricule.');
       } else {
-        alert('Erreur lors de la recherche de l\'étudiant.');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || 'Erreur lors de la recherche de l\'étudiant.';
+        alert(`Erreur: ${errorMessage}`);
+        console.error('Student lookup error:', errorData);
       }
     } catch (error) {
       console.error('Error looking up student:', error);
-      alert('Erreur lors de la recherche de l\'étudiant.');
+      alert('Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.');
     }
   };
 
@@ -65,6 +69,9 @@ export default function RequestForm() {
         },
         body: JSON.stringify(formData),
       });
+      
+      const data = await response.json();
+      
       if (response.ok) {
         alert('Demande soumise avec succès!');
         setFormData({
@@ -79,11 +86,14 @@ export default function RequestForm() {
         });
         setIsStudentLoaded(false);
       } else {
-        alert('Erreur lors de la soumission.');
+        // Show specific error message from server
+        const errorMessage = data.error || 'Erreur lors de la soumission.';
+        alert(`Erreur: ${errorMessage}`);
+        console.error('Submission error:', data);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Erreur lors de la soumission.');
+      alert('Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.');
     }
   };
 

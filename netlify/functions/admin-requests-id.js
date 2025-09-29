@@ -13,6 +13,12 @@ const createTransporter = () => {
 
 const sendStatusUpdateNotification = async (requestData) => {
   try {
+    // Check if email configuration is available
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
+      console.warn('Email configuration missing, skipping email notification');
+      return false;
+    }
+
     const transporter = createTransporter();
 
     const subject = requestData.status === 'approved'
@@ -75,8 +81,20 @@ exports.handler = async (event, context) => {
     };
   }
 
+  // Check for required environment variables
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL environment variable is missing');
+    return {
+      statusCode: 500,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Database configuration missing' })
+    };
+  }
+
+  let client;
   try {
-    const { id, status, adminComment, adminName } = JSON.parse(event.body);
+    const requestBody = JSON.parse(event.body);
+    const { id, status, adminComment, adminName } = requestBody;
 
     if (!id || !status || !['approved', 'rejected'].includes(status)) {
       return {
@@ -86,7 +104,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const client = new Client({
+    client = new Client({
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false }
     });
@@ -103,7 +121,6 @@ exports.handler = async (event, context) => {
     const updateResult = await client.query(updateQuery, [status, adminComment, adminName, id]);
 
     if (updateResult.rows.length === 0) {
-      await client.end();
       return {
         statusCode: 404,
         headers: { ...headers, 'Content-Type': 'application/json' },
@@ -112,14 +129,18 @@ exports.handler = async (event, context) => {
     }
 
     const requestData = updateResult.rows[0];
-    await client.end();
 
     // Send notification email
-    const emailSent = await sendStatusUpdateNotification({
-      ...requestData,
-      status,
-      adminComment,
-    });
+    let emailSent = false;
+    try {
+      emailSent = await sendStatusUpdateNotification({
+        ...requestData,
+        status,
+        adminComment,
+      });
+    } catch (emailError) {
+      console.error('Email sending failed but continuing:', emailError);
+    }
 
     return {
       statusCode: 200,
@@ -134,7 +155,18 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers: { ...headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Failed to update request' })
+      body: JSON.stringify({ 
+        error: 'Failed to update request',
+        details: error.message 
+      })
     };
+  } finally {
+    if (client) {
+      try {
+        await client.end();
+      } catch (closeError) {
+        console.error('Error closing database connection:', closeError);
+      }
+    }
   }
 };
