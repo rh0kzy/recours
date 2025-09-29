@@ -205,6 +205,25 @@ export default function RequestForm() {
           Remplissez ce formulaire pour demander un changement de spécialité
         </p>
       </div>
+
+      {/* Carte d'exemple de matricule */}
+      <div className="mb-6 p-3 sm:p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0">
+            <span className="text-2xl">💡</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-blue-300 font-medium text-sm sm:text-base">Exemple de matricule</h3>
+            <p className="text-blue-200/80 text-xs sm:text-sm mt-1">
+              Vous pouvez utiliser ce matricule pour tester : 
+              <span className="font-mono bg-blue-600/20 px-2 py-1 rounded ml-2 text-blue-100">
+                232331767009
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         <div>
           <label htmlFor="matricule" className="block text-sm font-semibold text-gray-300 mb-2">
