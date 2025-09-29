@@ -85,9 +85,16 @@ export default function AdminPage() {
   const handleSelectionModeToggle = () => {
     setSelectionMode(!selectionMode);
     setSelectedRequests([]);
+    // Clear selected request when entering selection mode
+    if (!selectionMode) {
+      setSelectedRequest(null);
+    }
   };
 
-  const handleRequestSelect = (requestId: number) => {
+  const handleRequestSelect = (requestId: number, event?: React.MouseEvent) => {
+    // Prevent event bubbling to avoid conflicts with detail view
+    event?.stopPropagation();
+    
     setSelectedRequests(prev => 
       prev.includes(requestId) 
         ? prev.filter(id => id !== requestId)
@@ -96,27 +103,56 @@ export default function AdminPage() {
   };
 
   const handleSelectAll = () => {
-    if (selectedRequests.length === requests.length) {
-      // If all are selected, deselect all
-      setSelectedRequests([]);
+    const pendingRequests = requests.filter(r => r.status === 'pending');
+    const allPendingSelected = pendingRequests.every(request => 
+      selectedRequests.includes(request.id)
+    );
+    
+    if (allPendingSelected && pendingRequests.length > 0) {
+      // Deselect all pending requests
+      setSelectedRequests(prev => 
+        prev.filter(id => !pendingRequests.find(r => r.id === id))
+      );
     } else {
-      // Select all requests
-      setSelectedRequests(requests.map(request => request.id));
+      // Select all pending requests (only pending can be deleted)
+      const pendingIds = pendingRequests.map(r => r.id);
+      setSelectedRequests(prev => {
+        const newSelection = [...prev];
+        pendingIds.forEach(id => {
+          if (!newSelection.includes(id)) {
+            newSelection.push(id);
+          }
+        });
+        return newSelection;
+      });
     }
   };
 
   const handleDeleteSelected = async () => {
-    if (selectedRequests.length === 0) {
-      alert('Veuillez sélectionner au moins une demande à supprimer.');
+    // Filter to only delete pending requests
+    const pendingSelectedRequests = selectedRequests.filter(id => {
+      const request = requests.find(r => r.id === id);
+      return request && request.status === 'pending';
+    });
+
+    if (pendingSelectedRequests.length === 0) {
+      alert('Veuillez sélectionner au moins une demande en attente à supprimer.\nNote: Seules les demandes en attente peuvent être supprimées.');
       return;
     }
 
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${selectedRequests.length} demande(s) ?`)) {
+    const nonPendingCount = selectedRequests.length - pendingSelectedRequests.length;
+    let confirmMessage = `Êtes-vous sûr de vouloir supprimer ${pendingSelectedRequests.length} demande(s) en attente ?`;
+    
+    if (nonPendingCount > 0) {
+      confirmMessage += `\n\nNote: ${nonPendingCount} demande(s) déjà traitée(s) ne seront pas supprimées.`;
+    }
+
+    if (!confirm(confirmMessage)) {
       return;
     }
 
     try {
-      const deletePromises = selectedRequests.map(id =>
+      const deletePromises = pendingSelectedRequests.map(id =>
         fetch(`/api/admin/requests/${id}`, {
           method: 'DELETE',
         })
@@ -128,7 +164,7 @@ export default function AdminPage() {
       if (failedDeletes.length > 0) {
         alert(`Erreur lors de la suppression de ${failedDeletes.length} demande(s).`);
       } else {
-        alert(`${selectedRequests.length} demande(s) supprimée(s) avec succès.`);
+        alert(`${pendingSelectedRequests.length} demande(s) supprimée(s) avec succès.`);
         setSelectedRequests([]);
         setSelectionMode(false);
         fetchRequests(); // Refresh the list
@@ -280,46 +316,70 @@ export default function AdminPage() {
           <div className="xl:col-span-2">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
-                <h2 className="text-lg sm:text-xl font-semibold text-white">Demandes</h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-lg sm:text-xl font-semibold text-white">Demandes</h2>
+                  {selectionMode && (
+                    <div className="bg-blue-500/20 px-3 py-1 rounded-full">
+                      <span className="text-blue-300 text-sm font-medium">
+                        {selectedRequests.length} sélectionnée(s)
+                      </span>
+                    </div>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                   <button
                     onClick={handleRefreshClick}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
+                    disabled={selectionMode}
+                    className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
                   >
                     <span>🔄</span>
-                    <span className="hidden sm:inline">Actualiser</span>
-                    <span className="sm:hidden">Actualiser</span>
+                    <span>Actualiser</span>
                   </button>
+                  
                   <button
                     onClick={handleSelectionModeToggle}
                     className={`px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base ${
                       selectionMode 
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white ring-2 ring-blue-400' 
                         : 'bg-gray-600 hover:bg-gray-700 text-white'
                     }`}
                   >
-                    <span>☑️</span>
-                    <span className="hidden sm:inline">Sélectionner</span>
-                    <span className="sm:hidden">Sélect.</span>
+                    <span>{selectionMode ? '✅' : '☑️'}</span>
+                    <span className="hidden sm:inline">
+                      {selectionMode ? 'Annuler' : 'Sélectionner'}
+                    </span>
+                    <span className="sm:hidden">
+                      {selectionMode ? 'Annuler' : 'Sélect.'}
+                    </span>
                   </button>
+                  
                   {selectionMode && (
                     <>
                       <button
                         onClick={handleSelectAll}
                         className="bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
                       >
-                        <span>{selectedRequests.length === requests.length ? '☑️' : '⬜'}</span>
-                        <span className="hidden sm:inline">Sélectionner tout</span>
+                        <span>{
+                          requests.filter(r => r.status === 'pending').every(r => selectedRequests.includes(r.id)) 
+                          && requests.filter(r => r.status === 'pending').length > 0
+                          ? '☑️' : '⬜'
+                        }</span>
+                        <span className="hidden sm:inline">Tout sélectionner</span>
                         <span className="sm:hidden">Tout</span>
                       </button>
+                      
                       <button
                         onClick={handleDeleteSelected}
                         disabled={selectedRequests.length === 0}
-                        className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
+                        className="bg-red-600 hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
                       >
                         <span>🗑️</span>
-                        <span className="hidden sm:inline">Supprimer ({selectedRequests.length})</span>
-                        <span className="sm:hidden">({selectedRequests.length})</span>
+                        <span className="hidden sm:inline">
+                          {selectedRequests.length > 0 ? `Supprimer (${selectedRequests.length})` : 'Supprimer'}
+                        </span>
+                        <span className="sm:hidden">
+                          {selectedRequests.length > 0 ? `(${selectedRequests.length})` : 'Sup.'}
+                        </span>
                       </button>
                     </>
                   )}
@@ -327,6 +387,21 @@ export default function AdminPage() {
               </div>
 
               <div className="space-y-3 sm:space-y-4 max-h-96 sm:max-h-[500px] overflow-y-auto">
+                {selectionMode && (
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 mb-4">
+                    <div className="flex items-start gap-2">
+                      <span className="text-blue-400 text-lg">ℹ️</span>
+                      <div>
+                        <p className="text-blue-300 text-sm font-medium">Mode de sélection activé</p>
+                        <p className="text-blue-200/80 text-xs mt-1">
+                          Seules les demandes en attente peuvent être sélectionnées pour suppression.
+                          Les demandes déjà traitées ne peuvent pas être supprimées.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 {requests.length === 0 ? (
                   <div className="text-center py-6 sm:py-8">
                     <div className="text-gray-400 text-3xl sm:text-4xl mb-4">📋</div>
@@ -337,29 +412,46 @@ export default function AdminPage() {
                   requests.map((request) => (
                     <div
                       key={request.id}
-                      className={`p-3 sm:p-4 rounded-lg border cursor-pointer transition-all ${
+                      className={`p-3 sm:p-4 rounded-lg border transition-all ${
                         selectedRequest?.id === request.id && !selectionMode
-                          ? 'bg-white/20 border-purple-400'
+                          ? 'bg-white/20 border-purple-400 ring-2 ring-purple-400/50'
                           : selectedRequests.includes(request.id) && selectionMode
-                          ? 'bg-blue-500/20 border-blue-400'
+                          ? 'bg-blue-500/20 border-blue-400 ring-2 ring-blue-400/50'
                           : 'bg-white/5 border-white/10 hover:bg-white/10'
-                      }`}
-                      onClick={() => selectionMode ? handleRequestSelect(request.id) : setSelectedRequest(request)}
+                      } ${selectionMode ? 'cursor-default' : 'cursor-pointer'}`}
+                      onClick={() => {
+                        if (!selectionMode) {
+                          setSelectedRequest(request);
+                        }
+                      }}
                     >
                       <div className="flex justify-between items-start mb-2 gap-2">
                         <div className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
                           {selectionMode && (
-                            <input
-                              type="checkbox"
-                              checked={selectedRequests.includes(request.id)}
-                              onChange={() => handleRequestSelect(request.id)}
-                              className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
-                            />
+                            <div 
+                              className="flex items-center justify-center"
+                              onClick={(e) => handleRequestSelect(request.id, e)}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedRequests.includes(request.id)}
+                                onChange={() => {}} // Controlled by parent click
+                                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 flex-shrink-0 cursor-pointer"
+                                disabled={request.status !== 'pending'} // Only pending requests can be selected for deletion
+                              />
+                            </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <h3 className="text-white font-semibold text-sm sm:text-base truncate">
-                              {request.prenom} {request.nom}
-                            </h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-white font-semibold text-sm sm:text-base truncate">
+                                {request.prenom} {request.nom}
+                              </h3>
+                              {request.status !== 'pending' && selectionMode && (
+                                <span className="text-xs text-gray-400 bg-gray-600/50 px-2 py-1 rounded">
+                                  Déjà traité
+                                </span>
+                              )}
+                            </div>
                             <p className="text-gray-300 text-xs sm:text-sm">Matricule: {request.matricule}</p>
                           </div>
                         </div>
