@@ -200,6 +200,11 @@ const sendStatusUpdateNotification = async (requestData) => {
 };
 
 exports.handler = async (event, context) => {
+  // Add debugging
+  console.log('Request method:', event.httpMethod);
+  console.log('Request path:', event.path);
+  console.log('Event body:', event.body);
+  
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -211,6 +216,7 @@ exports.handler = async (event, context) => {
   }
 
   if (!['PATCH', 'DELETE'].includes(event.httpMethod)) {
+    console.log('Method not allowed:', event.httpMethod);
     return {
       statusCode: 405,
       headers,
@@ -240,10 +246,14 @@ exports.handler = async (event, context) => {
     // Handle DELETE request
     if (event.httpMethod === 'DELETE') {
       // Extract id from path parameters
+      console.log('DELETE request path:', event.path);
       const pathParts = event.path.split('/');
+      console.log('Path parts:', pathParts);
       const id = parseInt(pathParts[pathParts.length - 1], 10);
+      console.log('Parsed ID:', id);
 
       if (!id || isNaN(id)) {
+        console.log('Invalid ID:', id);
         return {
           statusCode: 400,
           headers: { ...headers, 'Content-Type': 'application/json' },
