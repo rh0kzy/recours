@@ -13,6 +13,14 @@ interface FormData {
   raison: string;
 }
 
+interface Notification {
+  id: number;
+  type: 'success' | 'error' | 'info' | 'warning';
+  title: string;
+  message: string;
+  duration?: number;
+}
+
 export default function RequestForm() {
   const [formData, setFormData] = useState<FormData>({
     matricule: '',
@@ -26,6 +34,36 @@ export default function RequestForm() {
   });
 
   const [isStudentLoaded, setIsStudentLoaded] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  // Fonctions de gestion des notifications
+  const addNotification = (type: Notification['type'], title: string, message: string, duration = 5000) => {
+    const newNotification: Notification = {
+      id: Date.now(),
+      type,
+      title,
+      message,
+      duration
+    };
+    
+    setNotifications(prev => [...prev, newNotification]);
+    
+    // Auto-suppression après la durée spécifiée
+    if (duration > 0) {
+      setTimeout(() => {
+        removeNotification(newNotification.id);
+      }, duration);
+    }
+  };
+
+  const removeNotification = (id: number) => {
+    setNotifications(prev => prev.filter(notif => notif.id !== id));
+  };
+
+  const showSuccess = (title: string, message: string) => addNotification('success', title, message);
+  const showError = (title: string, message: string) => addNotification('error', title, message);
+  const showInfo = (title: string, message: string) => addNotification('info', title, message);
+  const showWarning = (title: string, message: string) => addNotification('warning', title, message);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -34,7 +72,7 @@ export default function RequestForm() {
 
   const handleLookup = async () => {
     if (!formData.matricule.trim()) {
-      alert('Veuillez entrer un matricule.');
+      showWarning('Matricule requis', 'Veuillez entrer un matricule.');
       return;
     }
 
@@ -45,17 +83,18 @@ export default function RequestForm() {
         const studentData = await response.json();
         setFormData(prev => ({ ...prev, ...studentData }));
         setIsStudentLoaded(true);
+        showSuccess('Étudiant trouvé', 'Les informations ont été chargées avec succès.');
       } else if (response.status === 404) {
-        alert('Étudiant non trouvé avec ce matricule.');
+        showError('Étudiant introuvable', 'Aucun étudiant trouvé avec ce matricule.');
       } else {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.error || 'Erreur lors de la recherche de l\'étudiant.';
-        alert(`Erreur: ${errorMessage}`);
+        showError('Erreur de recherche', errorMessage);
         console.error('Student lookup error:', errorData);
       }
     } catch (error) {
       console.error('Error looking up student:', error);
-      alert('Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.');
+      showError('Erreur de connexion', 'Veuillez vérifier votre connexion internet et réessayer.');
     }
   };
 
@@ -73,7 +112,7 @@ export default function RequestForm() {
       const data = await response.json();
       
       if (response.ok) {
-        alert('Demande soumise avec succès!');
+        showSuccess('Demande soumise', 'Votre demande a été soumise avec succès! Vous recevrez un email de confirmation.');
         setFormData({
           matricule: '',
           nom: '',
@@ -88,17 +127,56 @@ export default function RequestForm() {
       } else {
         // Show specific error message from server
         const errorMessage = data.error || 'Erreur lors de la soumission.';
-        alert(`Erreur: ${errorMessage}`);
+        showError('Erreur de soumission', errorMessage);
         console.error('Submission error:', data);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Erreur de connexion. Veuillez vérifier votre connexion internet et réessayer.');
+      showError('Erreur de connexion', 'Veuillez vérifier votre connexion internet et réessayer.');
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-gray-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50">
+    <>
+      {/* Système de notifications */}
+      <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm">
+        {notifications.map((notification) => (
+          <div
+            key={notification.id}
+            className={`p-4 rounded-lg border backdrop-blur-sm shadow-xl transform transition-all duration-300 ease-in-out ${
+              notification.type === 'success' 
+                ? 'bg-green-500/20 border-green-500/50 text-green-100'
+                : notification.type === 'error'
+                ? 'bg-red-500/20 border-red-500/50 text-red-100'
+                : notification.type === 'warning'
+                ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-100'
+                : 'bg-blue-500/20 border-blue-500/50 text-blue-100'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 flex-1">
+                <span className="text-lg flex-shrink-0">
+                  {notification.type === 'success' ? '✅' : 
+                   notification.type === 'error' ? '❌' : 
+                   notification.type === 'warning' ? '⚠️' : 'ℹ️'}
+                </span>
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-sm">{notification.title}</h4>
+                  <p className="text-xs mt-1 opacity-90">{notification.message}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => removeNotification(notification.id)}
+                className="text-gray-400 hover:text-white transition-colors flex-shrink-0 p-1"
+              >
+                <span className="text-lg">×</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="max-w-2xl mx-auto p-8 bg-gray-800/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50">
       <div className="text-center mb-8">
         <div className="flex justify-center mb-6">
           <img
@@ -250,6 +328,7 @@ export default function RequestForm() {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }

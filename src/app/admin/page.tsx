@@ -19,6 +19,14 @@ interface Request {
   reviewed_by?: string;
 }
 
+interface Notification {
+  id: number;
+  type: 'success' | 'error' | 'info' | 'warning';
+  title: string;
+  message: string;
+  duration?: number;
+}
+
 export default function AdminPage() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,10 +38,40 @@ export default function AdminPage() {
   const [retryCount, setRetryCount] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedRequests, setSelectedRequests] = useState<number[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     fetchRequests();
   }, []);
+
+  // Fonctions de gestion des notifications
+  const addNotification = (type: Notification['type'], title: string, message: string, duration = 5000) => {
+    const newNotification: Notification = {
+      id: Date.now(),
+      type,
+      title,
+      message,
+      duration
+    };
+    
+    setNotifications(prev => [...prev, newNotification]);
+    
+    // Auto-suppression après la durée spécifiée
+    if (duration > 0) {
+      setTimeout(() => {
+        removeNotification(newNotification.id);
+      }, duration);
+    }
+  };
+
+  const removeNotification = (id: number) => {
+    setNotifications(prev => prev.filter(notif => notif.id !== id));
+  };
+
+  const showSuccess = (title: string, message: string) => addNotification('success', title, message);
+  const showError = (title: string, message: string) => addNotification('error', title, message);
+  const showInfo = (title: string, message: string) => addNotification('info', title, message);
+  const showWarning = (title: string, message: string) => addNotification('warning', title, message);
 
   const fetchRequests = async (retry = false) => {
     try {
@@ -119,7 +157,7 @@ export default function AdminPage() {
 
   const handleDeleteSelected = async () => {
     if (selectedRequests.length === 0) {
-      alert('Veuillez sélectionner au moins une demande à supprimer.');
+      showWarning('Sélection requise', 'Veuillez sélectionner au moins une demande à supprimer.');
       return;
     }
 
@@ -154,16 +192,16 @@ export default function AdminPage() {
       const failedDeletes = results.filter(result => !result.ok);
 
       if (failedDeletes.length > 0) {
-        alert(`Erreur lors de la suppression de ${failedDeletes.length} demande(s).`);
+        showError('Suppression partielle', `Erreur lors de la suppression de ${failedDeletes.length} demande(s).`);
       } else {
-        alert(`${selectedRequests.length} demande(s) supprimée(s) avec succès.`);
+        showSuccess('Suppression réussie', `${selectedRequests.length} demande(s) supprimée(s) avec succès.`);
         setSelectedRequests([]);
         setSelectionMode(false);
         fetchRequests(); // Refresh the list
       }
     } catch (error) {
       console.error('Error deleting requests:', error);
-      alert('Erreur lors de la suppression des demandes.');
+      showError('Erreur de suppression', 'Erreur lors de la suppression des demandes.');
     }
   };
 
@@ -173,7 +211,7 @@ export default function AdminPage() {
 
   const updateRequestStatus = async (id: number, status: 'approved' | 'rejected') => {
     if (!adminName.trim()) {
-      alert('Veuillez saisir votre nom d\'administrateur');
+      showWarning('Nom requis', 'Veuillez saisir votre nom d\'administrateur');
       return;
     }
 
@@ -193,16 +231,19 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
-        alert(`Demande ${status === 'approved' ? 'approuvée' : 'refusée'} avec succès!`);
+        showSuccess(
+          'Demande traitée', 
+          `Demande ${status === 'approved' ? 'approuvée' : 'refusée'} avec succès!`
+        );
         setSelectedRequest(null);
         setAdminComment('');
         await fetchRequests(); // Refresh the list
       } else {
-        alert('Erreur lors de la mise à jour de la demande');
+        showError('Erreur de mise à jour', 'Erreur lors de la mise à jour de la demande');
       }
     } catch (error) {
       console.error('Failed to update request:', error);
-      alert('Erreur lors de la mise à jour');
+      showError('Erreur de connexion', 'Erreur lors de la mise à jour');
     } finally {
       setUpdating(false);
     }
@@ -266,6 +307,44 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Système de notifications */}
+      <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm">
+        {notifications.map((notification) => (
+          <div
+            key={notification.id}
+            className={`p-4 rounded-lg border backdrop-blur-sm shadow-xl transform transition-all duration-300 ease-in-out ${
+              notification.type === 'success' 
+                ? 'bg-green-500/20 border-green-500/50 text-green-100'
+                : notification.type === 'error'
+                ? 'bg-red-500/20 border-red-500/50 text-red-100'
+                : notification.type === 'warning'
+                ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-100'
+                : 'bg-blue-500/20 border-blue-500/50 text-blue-100'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 flex-1">
+                <span className="text-lg flex-shrink-0">
+                  {notification.type === 'success' ? '✅' : 
+                   notification.type === 'error' ? '❌' : 
+                   notification.type === 'warning' ? '⚠️' : 'ℹ️'}
+                </span>
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-sm">{notification.title}</h4>
+                  <p className="text-xs mt-1 opacity-90">{notification.message}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => removeNotification(notification.id)}
+                className="text-gray-400 hover:text-white transition-colors flex-shrink-0 p-1"
+              >
+                <span className="text-lg">×</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
