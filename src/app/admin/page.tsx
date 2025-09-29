@@ -231,10 +231,20 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
-        showSuccess(
-          'Demande traitée', 
-          `Demande ${status === 'approved' ? 'approuvée' : 'refusée'} avec succès!`
-        );
+        const responseData = await response.json();
+        
+        if (status === 'approved' && selectedRequest) {
+          showSuccess(
+            'Demande approuvée & Transfert effectué', 
+            `L'étudiant a été automatiquement transféré vers ${selectedRequest.specialite_souhaitee}. Email de confirmation envoyé.`
+          );
+        } else {
+          showSuccess(
+            'Demande refusée', 
+            'La demande a été refusée. Email de notification envoyé à l\'étudiant.'
+          );
+        }
+        
         setSelectedRequest(null);
         setAdminComment('');
         await fetchRequests(); // Refresh the list

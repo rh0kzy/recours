@@ -34,6 +34,22 @@ export async function PATCH(request: NextRequest) {
 
     const requestData = updateResult.rows[0];
 
+    // If approved, automatically transfer student to new specialty
+    if (status === 'approved') {
+      try {
+        const transferQuery = `
+          UPDATE students
+          SET specialite = $1
+          WHERE matricule = $2
+        `;
+        await client.query(transferQuery, [requestData.specialite_souhaitee, requestData.matricule]);
+        console.log(`Student ${requestData.matricule} transferred to specialty: ${requestData.specialite_souhaitee}`);
+      } catch (transferError) {
+        console.error('Error transferring student to new specialty:', transferError);
+        // Continue with the process even if transfer fails, but log the error
+      }
+    }
+
     // Send notification email to student
     const emailSent = await sendStatusUpdateNotification({
       ...requestData,
@@ -43,7 +59,10 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       message: `Request ${status} successfully`,
-      emailSent
+      emailSent,
+      ...(status === 'approved' && { 
+        transferMessage: `Student automatically transferred to ${requestData.specialite_souhaitee}` 
+      })
     });
   } catch (error) {
     console.error(error);
@@ -161,7 +180,10 @@ async function sendStatusUpdateNotification(data: {
 
           <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
             ${data.status === 'approved'
-              ? 'Votre changement de spécialité a été approuvé. Veuillez vous présenter au service concerné pour finaliser les démarches administratives.'
+              ? `🎉 <strong>Félicitations !</strong> Votre changement de spécialité a été approuvé.<br><br>
+                 <strong style="color: #4CAF50;">✅ Transfert automatique effectué :</strong><br>
+                 Vous avez été automatiquement transféré(e) de <strong>${data.specialite_actuelle}</strong> vers <strong>${data.specialite_souhaitee}</strong>.<br><br>
+                 Votre nouvelle spécialité est maintenant active dans notre système. Veuillez vous présenter au service concerné pour finaliser les démarches administratives et récupérer vos nouveaux documents d'inscription.`
               : 'Votre demande de changement de spécialité a été refusée. Pour plus d\'informations, veuillez contacter l\'administration.'}
           </p>
 
