@@ -1,0 +1,277 @@
+===============================================
+FONCTIONNALITÉS À AJOUTER - SYSTÈME DE RECOURS
+===============================================
+
+🔐 SÉCURITÉ & AUTHENTICATION
+============================
+
+1. Rate Limiting
+   - Limiter les tentatives de connexion (max 5 essais/15 min)
+   - Protéger les API contre les abus
+   - Déjà partiellement en place avec failed_login_attempts dans la DB
+
+2. Session Timeout
+   - Déconnexion automatique après 30 min d'inactivité
+   - Rafraîchissement du token JWT
+
+3. Password Reset
+   - Fonctionnalité "Mot de passe oublié"
+   - Envoi d'email avec lien de réinitialisation
+   - Le lien "Forgot password?" existe déjà mais n'est pas fonctionnel
+
+4. 2FA (Two-Factor Authentication)
+   - Pour les Super Admins
+   - Code par email ou authenticator app
+
+
+📊 DASHBOARD & ANALYTICS
+========================
+
+5. Statistiques en Temps Réel
+   - Graphiques des demandes (par jour/semaine/mois)
+   - Taux d'approbation/rejet
+   - Temps moyen de traitement
+   - Demandes par spécialité
+
+6. Filtres Avancés
+   - Filtrer par date (plage)
+   - Filtrer par spécialité (actuelle/souhaitée)
+   - Filtrer par statut
+   - Recherche par nom/matricule
+
+7. Tri des Colonnes
+   - Trier par date (plus récent/ancien)
+   - Trier par nom alphabétique
+   - Trier par statut
+
+
+📧 NOTIFICATIONS & COMMUNICATION
+================================
+
+8. Notifications en Temps Réel
+   - WebSocket ou Server-Sent Events
+   - Notification quand nouvelle demande arrive
+   - Badge de compteur sur l'icône
+
+9. Templates d'Email Personnalisables
+   - Personnaliser les emails d'approbation/rejet
+   - Variables dynamiques (nom, spécialité, etc.)
+
+10. Commentaires & Discussion
+    - Les admins peuvent échanger sur une demande
+    - Historique des commentaires
+    - Mention d'autres admins (@user)
+
+
+📄 GESTION DE DOCUMENTS
+=======================
+
+11. Upload de Justificatifs
+    - Les étudiants peuvent joindre des documents
+    - Bulletins, certificats médicaux, etc.
+    - Stockage dans Supabase Storage ou autre
+
+12. Génération de PDF
+    - Certificat d'approbation automatique
+    - Rapport de refus officiel
+    - Export des demandes en PDF
+
+
+🔍 AUDIT & HISTORIQUE
+=====================
+
+13. Logs d'Audit Complets
+    - Qui a fait quoi et quand
+    - IP address tracking
+    - User agent logging
+    - Table audit_logs déjà prévue dans la migration
+
+14. Historique des Modifications
+    - Voir l'historique complet d'une demande
+    - Qui l'a modifiée, approuvée, rejetée
+    - Timeline visuelle
+
+
+📱 UX/UI AMÉLIORATIONS
+======================
+
+15. Dark Mode
+    - Toggle dark/light theme
+    - Préférence sauvegardée
+
+16. Pagination
+    - Pour les grandes listes (>100 demandes)
+    - Load more / Infinite scroll
+
+17. Bulk Actions
+    - Déjà partiellement en place (sélection multiple)
+    - Ajouter : Approuver plusieurs, Rejeter plusieurs
+    - Export multiple en Excel
+
+18. Preview Modal
+    - Prévisualisation rapide sans ouvrir la page entière
+    - Quick actions (approve/reject) depuis le modal
+
+
+📊 RAPPORTS & EXPORT
+====================
+
+19. Export Excel/CSV
+    - Exporter les demandes filtrées
+    - Format personnalisable
+    - Inclure statistiques
+
+20. Rapports Automatiques
+    - Rapport mensuel envoyé par email
+    - Statistiques pour le doyen
+    - Format PDF professionnel
+
+
+🔔 SYSTÈME DE WORKFLOW
+======================
+
+21. États Intermédiaires
+    - "En cours d'examen"
+    - "En attente de documents"
+    - "Nécessite validation département"
+
+22. Assignation de Demandes
+    - Assigner une demande à un admin spécifique
+    - Permission ASSIGN_REQUESTS déjà définie
+    - Notifications quand assigné
+
+23. Deadlines & Rappels
+    - Date limite de traitement
+    - Rappel automatique si pas traité
+    - Highlight des demandes urgentes
+
+
+🎓 SPÉCIFIQUE ÉTUDIANTS
+=======================
+
+24. Suivi de Demande
+    - Page où l'étudiant peut suivre sa demande
+    - Code de suivi unique
+    - Notifications par email
+
+25. Historique Personnel
+    - L'étudiant voit ses anciennes demandes
+    - Authentification par matricule + email
+
+26. Formulaire Multi-Étapes
+    - Wizard en plusieurs étapes
+    - Validation progressive
+    - Sauvegarde brouillon
+
+
+🔧 ADMINISTRATION AVANCÉE
+=========================
+
+27. Configuration Système
+    - Paramètres modifiables (dates limites, etc.)
+    - Liste des spécialités disponibles
+    - Capacité d'accueil par spécialité
+
+28. Gestion des Périodes
+    - Définir période d'ouverture/fermeture
+    - "Les recours sont fermés" automatique
+    - Planning annuel
+
+29. Backup Automatique
+    - Sauvegarde quotidienne de la DB
+    - Export automatique vers cloud
+
+
+📧 INTÉGRATIONS
+===============
+
+30. Intégration avec Système Universitaire
+    - API avec le système de gestion scolaire
+    - Vérification automatique du matricule
+    - Transfert automatique confirmé
+
+31. Calendrier
+    - Intégration Google Calendar
+    - Réunions de comité de recours
+    - Dates importantes
+
+
+🚀 PERFORMANCE
+==============
+
+32. Caching
+    - Redis pour les sessions
+    - Cache des requêtes fréquentes
+    - Réduction de la charge DB
+
+33. Lazy Loading
+    - Images chargées progressivement
+    - Components chargés à la demande
+
+
+🛡️ COMPLIANCE
+==============
+
+34. RGPD / Privacy
+    - Consentement explicite
+    - Droit à l'oubli
+    - Export des données personnelles
+
+35. Archivage
+    - Archivage automatique après X mois
+    - Conservation légale des données
+
+
+===============================================
+🎯 PRIORITÉS RECOMMANDÉES
+===============================================
+
+COURT TERME (1-2 semaines)
+---------------------------
+1. ✅ Filtres et recherche (#6)
+2. ✅ Export Excel (#19)
+3. ✅ Pagination (#16)
+4. ✅ Bulk approve/reject (#17)
+5. ✅ Password reset (#3)
+
+MOYEN TERME (1 mois)
+---------------------
+1. ✅ Dashboard avec stats (#5)
+2. ✅ Upload documents (#11)
+3. ✅ Suivi étudiant (#24)
+4. ✅ Logs d'audit (#13)
+5. ✅ Assignation demandes (#22)
+
+LONG TERME (2-3 mois)
+----------------------
+1. ✅ Notifications temps réel (#8)
+2. ✅ Génération PDF (#12)
+3. ✅ 2FA (#4)
+4. ✅ Intégrations système (#30)
+5. ✅ Rapports automatiques (#20)
+
+
+===============================================
+NOTES
+===============================================
+
+- Les fonctionnalités les plus impactantes seraient :
+  * Les filtres/recherche (améliore l'UX immédiatement)
+  * Le dashboard avec statistiques (pour les décideurs)
+  * L'export Excel (besoin fréquent)
+  * Le suivi étudiant (transparence)
+
+- Certaines bases sont déjà en place :
+  * Système de permissions (viewer, reviewer, etc.)
+  * Structure de la base de données
+  * Architecture Next.js + Supabase
+  * Système d'email configuré
+
+- Technologies suggérées :
+  * Chart.js ou Recharts pour les graphiques
+  * XLSX ou ExcelJS pour l'export Excel
+  * jsPDF pour la génération de PDF
+  * Socket.io pour les notifications temps réel
+  * React Query pour le caching
+
+===============================================

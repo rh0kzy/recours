@@ -14,11 +14,14 @@ export default function AdminLoginPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
+  const [isRateLimited, setIsRateLimited] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setIsRateLimited(false);
 
     try {
       const response = await fetch('/api/auth/login', {
@@ -36,6 +39,15 @@ export default function AdminLoginPage() {
 
       if (!response.ok) {
         setError(data.error || 'Login failed');
+        
+        // Si rate limited (429)
+        if (response.status === 429) {
+          setIsRateLimited(true);
+          setRemainingAttempts(0);
+        } else if (data.remainingAttempts !== undefined) {
+          setRemainingAttempts(data.remainingAttempts);
+        }
+        
         return;
       }
 
@@ -84,12 +96,35 @@ export default function AdminLoginPage() {
           <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
             {/* Error Message */}
             {error && (
-              <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-xs sm:text-sm">
-                <div className="flex items-center">
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              <div className={`border px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-xs sm:text-sm ${
+                isRateLimited 
+                  ? 'bg-orange-500/10 border-orange-500/50 text-orange-400' 
+                  : 'bg-red-500/10 border-red-500/50 text-red-400'
+              }`}>
+                <div className="flex items-start">
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    {isRateLimited ? (
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+                    ) : (
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    )}
                   </svg>
-                  <span className="break-words">{error}</span>
+                  <div className="flex-1">
+                    <span className="break-words block">{error}</span>
+                    {remainingAttempts !== null && remainingAttempts >= 0 && !isRateLimited && (
+                      <span className="text-xs mt-1 block opacity-80">
+                        {remainingAttempts > 0 
+                          ? `${remainingAttempts} tentative${remainingAttempts > 1 ? 's' : ''} restante${remainingAttempts > 1 ? 's' : ''}`
+                          : 'Dernière tentative avant blocage'
+                        }
+                      </span>
+                    )}
+                    {isRateLimited && (
+                      <span className="text-xs mt-1 block opacity-80">
+                        🔒 Pour votre sécurité, l&apos;accès a été temporairement restreint.
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
