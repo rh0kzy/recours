@@ -1,12 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminHeader from '@/components/AdminHeader';
 import StatsCards from '@/components/dashboard/StatsCards';
 import RequestsChart from '@/components/dashboard/RequestsChart';
 import ApprovalRateChart from '@/components/dashboard/ApprovalRateChart';
 import SpecialtyChart from '@/components/dashboard/SpecialtyChart';
+import type { AdminRole } from '@/lib/permissions';
+
+interface AdminUser {
+  name: string;
+  email: string;
+  role: AdminRole;
+}
 
 interface Statistics {
   overview: {
@@ -38,14 +45,9 @@ export default function DashboardPage() {
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AdminUser | null>(null);
 
-  useEffect(() => {
-    checkAuth();
-    fetchStatistics();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await fetch('/api/auth/session');
       if (response.ok) {
@@ -58,9 +60,9 @@ export default function DashboardPage() {
       console.error('Auth check error:', error);
       router.push('/admin/login');
     }
-  };
+  }, [router]);
 
-  const fetchStatistics = async () => {
+  const fetchStatistics = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -86,7 +88,12 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    checkAuth();
+    fetchStatistics();
+  }, [checkAuth, fetchStatistics]);
 
   if (loading) {
     return (
@@ -137,7 +144,7 @@ export default function DashboardPage() {
             Tableau de bord
           </h1>
           <p className="text-gray-600">
-            Vue d'ensemble des demandes de changement de spécialité
+            Vue d&apos;ensemble des demandes de changement de spécialité
           </p>
         </div>
 
@@ -171,7 +178,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="border-l-4 border-green-500 pl-4">
-                <p className="text-sm text-gray-600">Taux d'approbation</p>
+                <p className="text-sm text-gray-600">Taux d&apos;approbation</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {statistics.overview.approvalRate}%
                 </p>

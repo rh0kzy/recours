@@ -1,5 +1,4 @@
 import { supabase } from './supabase';
-import crypto from 'crypto';
 
 /**
  * Génère un code 2FA à 6 chiffres

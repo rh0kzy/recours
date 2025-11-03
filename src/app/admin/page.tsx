@@ -601,6 +601,7 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3 sm:gap-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-usthb.png"
                 alt="Université des Sciences et de Technologie Houari Boumediene"
@@ -814,6 +815,7 @@ export default function AdminPage() {
                           )}
                           {!selectionMode && (
                             <div className="flex items-center justify-center flex-shrink-0">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src="/logo-usthb.png"
                                 alt="USTHB"

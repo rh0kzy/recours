@@ -88,6 +88,7 @@ export function useSessionTimeout(options: UseSessionTimeoutOptions = {}) {
       // Si le rafraîchissement échoue, déconnecter
       handleLogout();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateActivity]);
 
   /**
@@ -106,6 +107,7 @@ export function useSessionTimeout(options: UseSessionTimeoutOptions = {}) {
     } catch (error) {
       console.error('❌ Session check failed:', error);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**

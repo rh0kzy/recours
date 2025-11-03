@@ -54,7 +54,7 @@ function Verify2FAContent() {
 
       // Succès - rediriger vers le dashboard
       router.push('/admin');
-    } catch (err) {
+    } catch {
       setError('Erreur de connexion. Veuillez réessayer.');
       setLoading(false);
     }
@@ -83,7 +83,7 @@ function Verify2FAContent() {
       setResendSuccess(true);
       setCountdown(60); // 60 secondes avant de pouvoir renvoyer
       setResendLoading(false);
-    } catch (err) {
+    } catch {
       setError('Erreur de connexion. Veuillez réessayer.');
       setResendLoading(false);
     }

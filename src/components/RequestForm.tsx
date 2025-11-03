@@ -191,6 +191,7 @@ export default function RequestForm() {
       
       <div className="text-center mb-6 sm:mb-8">
         <div className="flex justify-center mb-4 sm:mb-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo-usthb.png"
             alt="Université des Sciences et de Technologie Houari Boumediene"

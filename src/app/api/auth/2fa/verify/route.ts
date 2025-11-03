@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
     const token = await createSession(user.id, ipAddress, userAgent);
 
     // Préparer l'objet user sans le mot de passe
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password_hash, ...userWithoutPassword } = user;
 
     // Créer la réponse avec le cookie de session

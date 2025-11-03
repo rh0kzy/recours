@@ -66,7 +66,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
           </div>
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          Taux d'approbation: {stats.approvalRate}%
+          Taux d&apos;approbation: {stats.approvalRate}%
         </p>
       </div>
 

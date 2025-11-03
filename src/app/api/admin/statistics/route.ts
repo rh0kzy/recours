@@ -109,7 +109,6 @@ export async function GET(request: NextRequest) {
     // Demandes par semaine (12 dernières semaines)
     const requestsByWeek: Record<string, number> = {};
     for (let i = 11; i >= 0; i--) {
-      const weekStart = new Date(now.getTime() - i * 7 * 24 * 60 * 60 * 1000);
       const weekNum = `Semaine ${12 - i}`;
       requestsByWeek[weekNum] = 0;
     }
