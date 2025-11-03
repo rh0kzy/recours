@@ -409,20 +409,22 @@ export default function AdminPage() {
       {/* Admin Header */}
       {currentUser && <AdminHeader user={currentUser} />}
       
-      {/* Système de notifications */}
-      <div className="fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50 space-y-3 max-w-sm sm:max-w-sm mx-auto sm:mx-0">
-        {notifications.map((notification) => (
-          <div
-            key={notification.id}
-            className={`p-4 rounded-lg border backdrop-blur-sm shadow-xl transform transition-all duration-300 ease-in-out ${
-              notification.type === 'success' 
-                ? 'bg-green-500/20 border-green-500/50 text-green-100'
-                : notification.type === 'error'
-                ? 'bg-red-500/20 border-red-500/50 text-red-100'
-                : notification.type === 'warning'
-                ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-100'
-                : 'bg-blue-500/20 border-blue-500/50 text-blue-100'
-            }`}
+      {/* Main Content with proper spacing for header */}
+      <div className="pt-24 md:pt-20">
+        {/* Système de notifications */}
+        <div className="fixed top-24 md:top-24 left-4 right-4 sm:right-4 sm:left-auto z-40 space-y-3 max-w-sm sm:max-w-sm mx-auto sm:mx-0">
+          {notifications.map((notification) => (
+            <div
+              key={notification.id}
+              className={`p-4 rounded-lg border backdrop-blur-sm shadow-xl transform transition-all duration-300 ease-in-out ${
+                notification.type === 'success' 
+                  ? 'bg-green-500/20 border-green-500/50 text-green-100'
+                  : notification.type === 'error'
+                  ? 'bg-red-500/20 border-red-500/50 text-red-100'
+                  : notification.type === 'warning'
+                  ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-100'
+                  : 'bg-blue-500/20 border-blue-500/50 text-blue-100'
+              }`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-2 flex-1">
@@ -904,6 +906,7 @@ export default function AdminPage() {
           </div>
         </div>
       )}
+      </div> {/* Close pt-24 md:pt-20 div */}
     </div>
   );
 }
