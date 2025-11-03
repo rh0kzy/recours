@@ -73,16 +73,26 @@ FONCTIONNALITÉS À AJOUTER - SYSTÈME DE RECOURS
    - ✅ API endpoint /api/admin/statistics
    - ✅ Gestion du cas table vide/inexistante
 
-6. Filtres Avancés
-   - Filtrer par date (plage)
-   - Filtrer par spécialité (actuelle/souhaitée)
-   - Filtrer par statut
-   - Recherche par nom/matricule
+6. ✅ Filtres Avancés (TERMINÉ)
+   - ✅ Filtrer par date (plage avec date de début et fin)
+   - ✅ Filtrer par spécialité (actuelle ET souhaitée)
+   - ✅ Filtrer par statut (pending/approved/rejected)
+   - ✅ Recherche par nom/matricule (recherche en temps réel)
+   - ✅ Panneau extensible/réductible
+   - ✅ Badge "Actifs" quand filtres appliqués
+   - ✅ Bouton "Réinitialiser" pour tout effacer
+   - ✅ Liste déroulante des spécialités dynamique
+   - ✅ Message quand aucun résultat
 
-7. Tri des Colonnes
-   - Trier par date (plus récent/ancien)
-   - Trier par nom alphabétique
-   - Trier par statut
+7. ✅ Tri des Colonnes (TERMINÉ)
+   - ✅ Trier par date (plus récent/ancien)
+   - ✅ Trier par nom alphabétique
+   - ✅ Trier par statut (pending → approved → rejected)
+   - ✅ Trier par spécialité souhaitée
+   - ✅ Indicateur visuel du tri actif
+   - ✅ Flèche ascendante/descendante
+   - ✅ Compteur de résultats
+   - ✅ Interface intuitive avec boutons
 
 
 📧 NOTIFICATIONS & COMMUNICATION

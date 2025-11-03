@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminHeader from '@/components/AdminHeader';
+import RequestFilters from '@/components/RequestFilters';
+import SortHeader, { SortField, SortOrder } from '@/components/SortHeader';
 import { AdminRole, hasPermission, PERMISSIONS, getRoleLabel } from '@/lib/permissions';
 
 interface Request {
@@ -55,6 +57,118 @@ export default function AdminPage() {
     approved: number;
     rejected: number;
   } | null>(null);
+
+  // États pour les filtres et le tri
+  const [filters, setFilters] = useState({
+    search: '',
+    status: 'all',
+    specialiteActuelle: 'all',
+    specialiteSouhaitee: 'all',
+    dateFrom: '',
+    dateTo: ''
+  });
+  const [sortField, setSortField] = useState<SortField>('created_at');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+
+  // Extraction des spécialités uniques pour les filtres
+  const uniqueSpecialites = useMemo(() => {
+    const specialites = new Set<string>();
+    requests.forEach(req => {
+      if (req.specialite_actuelle) specialites.add(req.specialite_actuelle);
+      if (req.specialite_souhaitee) specialites.add(req.specialite_souhaitee);
+    });
+    return Array.from(specialites).sort();
+  }, [requests]);
+
+  // Application des filtres et du tri
+  const filteredAndSortedRequests = useMemo(() => {
+    let filtered = [...requests];
+
+    // Filtre par recherche (nom, prénom, matricule)
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(req =>
+        req.nom.toLowerCase().includes(searchLower) ||
+        req.prenom.toLowerCase().includes(searchLower) ||
+        req.matricule.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Filtre par statut
+    if (filters.status !== 'all') {
+      filtered = filtered.filter(req => req.status === filters.status);
+    }
+
+    // Filtre par spécialité actuelle
+    if (filters.specialiteActuelle !== 'all') {
+      filtered = filtered.filter(req => req.specialite_actuelle === filters.specialiteActuelle);
+    }
+
+    // Filtre par spécialité souhaitée
+    if (filters.specialiteSouhaitee !== 'all') {
+      filtered = filtered.filter(req => req.specialite_souhaitee === filters.specialiteSouhaitee);
+    }
+
+    // Filtre par plage de dates
+    if (filters.dateFrom) {
+      const fromDate = new Date(filters.dateFrom);
+      filtered = filtered.filter(req => new Date(req.created_at) >= fromDate);
+    }
+    if (filters.dateTo) {
+      const toDate = new Date(filters.dateTo);
+      toDate.setHours(23, 59, 59, 999); // Inclure toute la journée
+      filtered = filtered.filter(req => new Date(req.created_at) <= toDate);
+    }
+
+    // Tri
+    filtered.sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortField) {
+        case 'created_at':
+          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+        case 'nom':
+          comparison = a.nom.localeCompare(b.nom);
+          break;
+        case 'status':
+          const statusOrder = { pending: 1, approved: 2, rejected: 3 };
+          comparison = statusOrder[a.status] - statusOrder[b.status];
+          break;
+        case 'specialite_souhaitee':
+          comparison = a.specialite_souhaitee.localeCompare(b.specialite_souhaitee);
+          break;
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return filtered;
+  }, [requests, filters, sortField, sortOrder]);
+
+  // Gestion du tri
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Inverse l'ordre si on clique sur le même champ
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Nouveau champ, ordre par défaut (desc pour date, asc pour texte)
+      setSortField(field);
+      setSortOrder(field === 'created_at' ? 'desc' : 'asc');
+    }
+  };
+
+  // Réinitialisation des filtres
+  const handleResetFilters = () => {
+    setFilters({
+      search: '',
+      status: 'all',
+      specialiteActuelle: 'all',
+      specialiteSouhaitee: 'all',
+      dateFrom: '',
+      dateTo: ''
+    });
+  };
 
   // Check session on mount
   useEffect(() => {
@@ -609,7 +723,25 @@ export default function AdminPage() {
                     )}
                   </div>
                 </div>
-              </div>              <div className="space-y-3 sm:space-y-4 max-h-96 sm:max-h-[500px] overflow-y-auto">
+              </div>
+
+              {/* Filtres avancés */}
+              <RequestFilters
+                filters={filters}
+                onFilterChange={setFilters}
+                specialites={uniqueSpecialites}
+                onReset={handleResetFilters}
+              />
+
+              {/* En-tête de tri */}
+              <SortHeader
+                sortField={sortField}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+                totalResults={filteredAndSortedRequests.length}
+              />
+
+              <div className="space-y-3 sm:space-y-4 max-h-96 sm:max-h-[500px] overflow-y-auto">
                 {selectionMode && (
                   <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
                     <div className="flex items-start gap-3">
@@ -630,14 +762,26 @@ export default function AdminPage() {
                   </div>
                 )}
                 
-                {requests.length === 0 ? (
+                {filteredAndSortedRequests.length === 0 ? (
                   <div className="text-center py-6 sm:py-8">
                     <div className="text-gray-400 text-3xl sm:text-4xl mb-4">📋</div>
-                    <p className="text-gray-400 text-sm sm:text-base">Aucune demande trouvée</p>
-                    <p className="text-gray-500 text-xs sm:text-sm mt-2">Les nouvelles demandes apparaîtront ici</p>
+                    <p className="text-gray-400 text-sm sm:text-base">
+                      {requests.length === 0 ? 'Aucune demande trouvée' : 'Aucun résultat ne correspond aux filtres'}
+                    </p>
+                    {requests.length > 0 && filteredAndSortedRequests.length === 0 && (
+                      <button
+                        onClick={handleResetFilters}
+                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Réinitialiser les filtres
+                      </button>
+                    )}
+                    <p className="text-gray-500 text-xs sm:text-sm mt-2">
+                      {requests.length === 0 ? 'Les nouvelles demandes apparaîtront ici' : ''}
+                    </p>
                   </div>
                 ) : (
-                  requests.map((request) => (
+                  filteredAndSortedRequests.map((request) => (
                     <div
                       key={request.id}
                       className={`p-3 sm:p-4 rounded-lg border transition-all ${
