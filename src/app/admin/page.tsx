@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminHeader from '@/components/AdminHeader';
-import { AdminRole } from '@/lib/permissions';
+import { AdminRole, hasPermission, PERMISSIONS, getRoleLabel } from '@/lib/permissions';
 
 interface Request {
   id: number;
@@ -236,6 +236,20 @@ export default function AdminPage() {
   };
 
   const handleDeleteSelected = async () => {
+    // Vérifier les permissions
+    if (!currentUser) {
+      showError('Erreur', 'Utilisateur non authentifié');
+      return;
+    }
+
+    if (!hasPermission(currentUser.role, PERMISSIONS.DELETE_REQUESTS)) {
+      showError(
+        'Accès refusé', 
+        `Votre rôle (${getRoleLabel(currentUser.role)}) ne permet pas de supprimer des demandes.`
+      );
+      return;
+    }
+
     if (selectedRequests.length === 0) {
       showWarning('Sélection requise', 'Veuillez sélectionner au moins une demande à supprimer.');
       return;
@@ -299,6 +313,24 @@ export default function AdminPage() {
   };
 
   const updateRequestStatus = async (id: number, status: 'approved' | 'rejected') => {
+    // Vérifier les permissions
+    if (!currentUser) {
+      showError('Erreur', 'Utilisateur non authentifié');
+      return;
+    }
+
+    const requiredPermission = status === 'approved' 
+      ? PERMISSIONS.APPROVE_REQUESTS 
+      : PERMISSIONS.REJECT_REQUESTS;
+    
+    if (!hasPermission(currentUser.role, requiredPermission)) {
+      showError(
+        'Accès refusé', 
+        `Votre rôle (${getRoleLabel(currentUser.role)}) ne permet pas cette action.`
+      );
+      return;
+    }
+
     if (!adminName.trim()) {
       showWarning('Nom requis', 'Veuillez saisir votre nom d\'administrateur');
       return;
@@ -520,11 +552,15 @@ export default function AdminPage() {
                       
                       <button
                         onClick={handleSelectionModeToggle}
-                        className={`px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                        disabled={!currentUser || !hasPermission(currentUser.role, PERMISSIONS.DELETE_REQUESTS)}
+                        className={`px-4 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
                           selectionMode 
                             ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white ring-2 ring-blue-400/50' 
                             : 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white'
                         }`}
+                        title={!currentUser || !hasPermission(currentUser.role, PERMISSIONS.DELETE_REQUESTS) 
+                          ? "Vous n'avez pas la permission de supprimer des demandes" 
+                          : "Activer le mode sélection"}
                       >
                         <span className="text-lg">{selectionMode ? '✅' : '☑️'}</span>
                         <span className="hidden sm:inline">
@@ -733,13 +769,29 @@ export default function AdminPage() {
 
                   {selectedRequest.status === 'pending' && (
                     <div className="space-y-3 sm:space-y-4 pt-4 border-t border-white/20">
+                      {/* Message d'information sur les permissions */}
+                      {currentUser && !hasPermission(currentUser.role, PERMISSIONS.APPROVE_REQUESTS) && (
+                        <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-4">
+                          <div className="flex items-start gap-2">
+                            <span className="text-yellow-400 text-lg">⚠️</span>
+                            <div>
+                              <p className="text-yellow-100 text-sm font-semibold">Permissions limitées</p>
+                              <p className="text-yellow-200 text-xs mt-1">
+                                Votre rôle ({getRoleLabel(currentUser.role)}) ne permet pas d'approuver ou refuser les demandes.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       <div>
                         <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">Votre nom (administrateur)</label>
                         <input
                           type="text"
                           value={adminName}
                           onChange={(e) => setAdminName(e.target.value)}
-                          className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
+                          disabled={!currentUser || !hasPermission(currentUser.role, PERMISSIONS.APPROVE_REQUESTS)}
+                          className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                           placeholder="Nom de l'administrateur"
                         />
                       </div>
@@ -749,7 +801,8 @@ export default function AdminPage() {
                         <textarea
                           value={adminComment}
                           onChange={(e) => setAdminComment(e.target.value)}
-                          className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm sm:text-base"
+                          disabled={!currentUser || !hasPermission(currentUser.role, PERMISSIONS.APPROVE_REQUESTS)}
+                          className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                           rows={3}
                           placeholder="Ajouter un commentaire..."
                         />
@@ -758,8 +811,11 @@ export default function AdminPage() {
                       <div className="flex flex-col sm:flex-row gap-3">
                         <button
                           onClick={() => updateRequestStatus(selectedRequest.id, 'approved')}
-                          disabled={updating}
-                          className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+                          disabled={updating || !currentUser || !hasPermission(currentUser.role, PERMISSIONS.APPROVE_REQUESTS)}
+                          className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={!currentUser || !hasPermission(currentUser.role, PERMISSIONS.APPROVE_REQUESTS) 
+                            ? "Vous n'avez pas la permission d'approuver" 
+                            : "Approuver la demande"}
                         >
                           {updating ? (
                             <>
@@ -775,8 +831,11 @@ export default function AdminPage() {
                         </button>
                         <button
                           onClick={() => updateRequestStatus(selectedRequest.id, 'rejected')}
-                          disabled={updating}
-                          className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+                          disabled={updating || !currentUser || !hasPermission(currentUser.role, PERMISSIONS.REJECT_REQUESTS)}
+                          className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={!currentUser || !hasPermission(currentUser.role, PERMISSIONS.REJECT_REQUESTS) 
+                            ? "Vous n'avez pas la permission de refuser" 
+                            : "Refuser la demande"}
                         >
                           {updating ? (
                             <>
