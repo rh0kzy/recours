@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import Link from 'next/link';
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -191,7 +193,7 @@ export default function AdminLoginPage() {
 
         {/* Back to Home */}
         <div className="text-center">
-          <a
+          <Link
             href="/"
             className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors"
           >
@@ -199,7 +201,7 @@ export default function AdminLoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to homepage
-          </a>
+          </Link>
         </div>
       </div>
     </div>

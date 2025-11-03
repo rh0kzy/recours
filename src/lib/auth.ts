@@ -2,6 +2,7 @@
 import { Client } from 'pg';
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
+import { NextRequest } from 'next/server';
 
 export interface AdminUser {
   id: string;
@@ -285,7 +286,7 @@ async function logAuditAction(
   action: string,
   resourceType: string,
   resourceId: string,
-  details: any,
+  details: Record<string, unknown>,
   ipAddress?: string,
   userAgent?: string
 ): Promise<void> {
@@ -305,7 +306,7 @@ async function logAuditAction(
  * Extracts token from cookie and verifies it
  */
 export async function verifySessionFromRequest(
-  request: any
+  request: NextRequest
 ): Promise<{ success: boolean; user?: AdminUser; error?: string }> {
   try {
     console.log('verifySessionFromRequest called');

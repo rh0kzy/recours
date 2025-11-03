@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminHeader from '@/components/AdminHeader';
+import { AdminRole } from '@/lib/permissions';
 
 interface User {
   id: number;
@@ -20,7 +21,7 @@ interface User {
 interface CurrentUser {
   name: string;
   email: string;
-  role: string;
+  role: AdminRole;
 }
 
 export default function UsersPage() {
@@ -109,8 +110,9 @@ export default function UsersPage() {
       setShowCreateModal(false);
       setFormData({ name: '', email: '', password: '', role: 'viewer', department: '' });
       fetchUsers();
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create user';
+      alert(errorMessage);
     }
   };
 
@@ -133,8 +135,9 @@ export default function UsersPage() {
       setEditingUser(null);
       setFormData({ name: '', email: '', password: '', role: 'viewer', department: '' });
       fetchUsers();
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update user';
+      alert(errorMessage);
     }
   };
 
@@ -152,8 +155,9 @@ export default function UsersPage() {
       }
 
       fetchUsers();
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete user';
+      alert(errorMessage);
     }
   };
 

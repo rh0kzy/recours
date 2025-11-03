@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminHeader from '@/components/AdminHeader';
+import { AdminRole } from '@/lib/permissions';
 
 interface Request {
   id: number;
@@ -34,7 +35,7 @@ export default function AdminPage() {
   const [currentUser, setCurrentUser] = useState<{
     name: string;
     email: string;
-    role: string;
+    role: AdminRole;
   } | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);

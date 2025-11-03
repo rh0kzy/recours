@@ -11,9 +11,11 @@ const supabase = createClient(
 // GET: Get single user
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
+    
     const sessionResult = await verifySessionFromRequest(request);
     if (!sessionResult.success || !sessionResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -26,7 +28,7 @@ export async function GET(
     const { data: user, error } = await supabase
       .from('admin_users')
       .select('id, name, email, role, department, is_active, failed_login_attempts, locked_until, created_at, updated_at')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) throw error;
@@ -44,9 +46,11 @@ export async function GET(
 // PUT: Update user
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
+    
     const sessionResult = await verifySessionFromRequest(request);
     if (!sessionResult.success || !sessionResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -60,7 +64,7 @@ export async function PUT(
     const { name, email, password, role, department, is_active } = body;
 
     // Build update object
-    const updateData: any = {};
+    const updateData: Record<string, string | boolean | number | null> = {};
     
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) updateData.email = email;
@@ -90,7 +94,7 @@ export async function PUT(
     const { data: updatedUser, error } = await supabase
       .from('admin_users')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select('id, name, email, role, department, is_active, created_at, updated_at')
       .single();
 
@@ -102,7 +106,7 @@ export async function PUT(
         user_id: sessionResult.user.id,
         action: 'UPDATE_USER',
         resource_type: 'admin_user',
-        resource_id: params.id,
+        resource_id: id,
         details: body,
       },
     ]);
@@ -120,9 +124,11 @@ export async function PUT(
 // DELETE: Delete user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
+    
     const sessionResult = await verifySessionFromRequest(request);
     if (!sessionResult.success || !sessionResult.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -133,7 +139,7 @@ export async function DELETE(
     }
 
     // Prevent deleting yourself
-    if (sessionResult.user.id === params.id) {
+    if (sessionResult.user.id === id) {
       return NextResponse.json(
         { error: 'Cannot delete your own account' },
         { status: 400 }
@@ -143,7 +149,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('admin_users')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) throw error;
 
@@ -153,7 +159,7 @@ export async function DELETE(
         user_id: sessionResult.user.id,
         action: 'DELETE_USER',
         resource_type: 'admin_user',
-        resource_id: params.id,
+        resource_id: id,
         details: {},
       },
     ]);
