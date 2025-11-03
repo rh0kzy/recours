@@ -8,6 +8,111 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/**
+ * Envoie un code 2FA par email
+ */
+export const send2FACode = async (
+  email: string,
+  name: string,
+  code: string,
+  expiresInMinutes: number = 10
+) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: '🔐 Code de vérification 2FA - USTHB',
+    html: `
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Code de vérification 2FA</title>
+        <style>
+          @media screen and (max-width: 600px) {
+            .container { width: 100% !important; padding: 10px !important; }
+            .header { padding: 20px 15px !important; }
+            .code-box { font-size: 32px !important; padding: 20px !important; }
+          }
+        </style>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+        <div class="container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
+          
+          <!-- Header -->
+          <div class="header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">🔐 Code de Vérification 2FA</h1>
+          </div>
+
+          <!-- Main Content -->
+          <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            
+            <p style="color: #333; font-size: 18px; margin-bottom: 20px;">
+              Bonjour <strong>${name}</strong>,
+            </p>
+
+            <p style="color: #666; line-height: 1.6; margin-bottom: 25px;">
+              Vous tentez de vous connecter à votre compte administrateur. Pour des raisons de sécurité, veuillez utiliser le code ci-dessous pour compléter votre authentification :
+            </p>
+
+            <!-- Code Box -->
+            <div class="code-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 42px; font-weight: bold; text-align: center; padding: 30px; border-radius: 10px; margin: 30px 0; letter-spacing: 8px; font-family: 'Courier New', monospace;">
+              ${code}
+            </div>
+
+            <!-- Expiration Warning -->
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px;">
+              <p style="margin: 0; color: #856404; font-size: 14px;">
+                ⏰ <strong>Attention :</strong> Ce code expire dans <strong>${expiresInMinutes} minutes</strong>.
+              </p>
+            </div>
+
+            <!-- Security Notice -->
+            <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px;">
+              <p style="margin: 0; color: #721c24; font-size: 14px;">
+                🚨 <strong>Sécurité :</strong> Si vous n'avez pas demandé ce code, ignorez cet email et changez votre mot de passe immédiatement.
+              </p>
+            </div>
+
+            <p style="color: #666; line-height: 1.6; font-size: 14px; margin-top: 30px;">
+              <strong>Conseils de sécurité :</strong>
+            </p>
+            <ul style="color: #666; line-height: 1.8; font-size: 14px;">
+              <li>Ne partagez jamais ce code avec qui que ce soit</li>
+              <li>L'USTHB ne vous demandera jamais ce code par email ou téléphone</li>
+              <li>Vérifiez toujours l'URL dans votre navigateur</li>
+            </ul>
+
+          </div>
+
+          <!-- Footer -->
+          <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
+            <p style="margin: 5px 0;">
+              Université des Sciences et de Technologie Houari Boumediene
+            </p>
+            <p style="margin: 5px 0;">
+              Système de Gestion des Recours - Administration
+            </p>
+            <p style="margin: 15px 0 5px 0; color: #666;">
+              Ceci est un email automatique, merci de ne pas y répondre.
+            </p>
+          </div>
+
+        </div>
+      </body>
+      </html>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('2FA code email sent successfully to:', email);
+  } catch (error) {
+    console.error('Error sending 2FA code email:', error);
+    throw new Error('Failed to send 2FA code email');
+  }
+};
+
 export const sendSpecialtyChangeNotification = async (formData: {
   matricule: string;
   nom: string;

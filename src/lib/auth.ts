@@ -20,6 +20,73 @@ const JWT_SECRET = new TextEncoder().encode(
 const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
 
 /**
+ * Create a JWT session token and store it in the database
+ * Used for 2FA authentication after code verification
+ */
+export async function createSession(
+  userId: string,
+  ipAddress?: string,
+  userAgent?: string
+): Promise<string> {
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  try {
+    await client.connect();
+
+    // Get user info
+    const userQuery = `SELECT id, email, role FROM admin_users WHERE id = $1`;
+    const userResult = await client.query(userQuery, [userId]);
+
+    if (userResult.rows.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const user = userResult.rows[0];
+
+    // Generate JWT token
+    const token = await new SignJWT({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime('30m')
+      .setIssuedAt()
+      .sign(JWT_SECRET);
+
+    // Create session in database
+    const expiresAt = new Date(Date.now() + SESSION_DURATION);
+    await client.query(
+      `INSERT INTO admin_sessions (admin_user_id, token, expires_at, ip_address, user_agent)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [user.id, token, expiresAt, ipAddress, userAgent]
+    );
+
+    // Log successful login (2FA completed)
+    await logAuditAction(
+      client,
+      user.id,
+      'auth:2fa_login',
+      'auth',
+      user.id,
+      { email: user.email, method: '2fa' },
+      ipAddress,
+      userAgent
+    );
+
+    return token;
+  } catch (error) {
+    console.error('Create session error:', error);
+    throw error;
+  } finally {
+    await client.end();
+  }
+}
+
+/**
  * Authenticate admin user with email and password
  */
 export async function authenticateAdmin(

@@ -35,9 +35,22 @@ FONCTIONNALITÉS À AJOUTER - SYSTÈME DE RECOURS
    - ✅ Email HTML responsive avec instructions claires
    - ✅ Logs d'audit pour tracer les réinitialisations
 
-4. 2FA (Two-Factor Authentication)
-   - Pour les Super Admins
-   - Code par email ou authenticator app
+4. ✅ 2FA (Two-Factor Authentication) - TERMINÉ
+   - ✅ Activé automatiquement pour les Super Admins
+   - ✅ Code à 6 chiffres envoyé par email
+   - ✅ Expiration de 10 minutes
+   - ✅ Code à usage unique (ne peut être utilisé qu'une fois)
+   - ✅ Interface de vérification responsive (/admin/verify-2fa)
+   - ✅ Bouton "Renvoyer le code" avec cooldown de 60 secondes
+   - ✅ Email HTML professionnel avec template sécurisé
+   - ✅ Logs d'audit complets pour traçabilité
+   - ✅ API endpoints pour send/verify/toggle
+   - ✅ Protection contre les attaques de force brute
+   - ✅ Détection automatique lors de la connexion
+   - ✅ Invalidation des anciens codes lors de génération
+   - [ ] TODO: Authenticator app (Google Authenticator, Authy)
+   - [ ] TODO: Recovery codes de secours
+   - [ ] TODO: Option "Se souvenir de cet appareil"
 
 
 📊 DASHBOARD & ANALYTICS

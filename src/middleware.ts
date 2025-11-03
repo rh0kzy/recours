@@ -9,6 +9,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/admin/login') ||
     pathname.startsWith('/admin/forgot-password') ||
     pathname.startsWith('/admin/reset-password') ||
+    pathname.startsWith('/admin/verify-2fa') ||
     pathname.startsWith('/api/auth')
   ) {
     return NextResponse.next();

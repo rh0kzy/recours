@@ -61,7 +61,29 @@ function LoginForm() {
         return;
       }
 
-      // Redirect to admin page
+      // Vérifier si 2FA est requis
+      if (data.requires2FA) {
+        // Envoyer le code 2FA
+        const sendResponse = await fetch('/api/auth/2fa/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: formData.email }),
+        });
+
+        if (!sendResponse.ok) {
+          const sendData = await sendResponse.json();
+          setError(sendData.error || 'Erreur lors de l\'envoi du code 2FA');
+          return;
+        }
+
+        // Rediriger vers la page de vérification 2FA
+        router.push(`/admin/verify-2fa?email=${encodeURIComponent(formData.email)}&name=${encodeURIComponent(data.userName || '')}`);
+        return;
+      }
+
+      // Si pas de 2FA, rediriger directement vers admin
       router.push('/admin');
       router.refresh();
     } catch (error) {

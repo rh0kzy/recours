@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateAdmin } from '@/lib/auth';
+import { is2FAEnabled } from '@/lib/twoFactor';
 import { 
   checkAccountLock, 
   recordFailedLoginAttempt,
@@ -64,7 +65,21 @@ export async function POST(request: NextRequest) {
     // Réinitialiser les tentatives échouées en cas de succès
     await resetFailedAttempts(email);
 
-    // Create response with session cookie
+    // Vérifier si le 2FA est activé pour cet utilisateur
+    const twoFactorEnabled = await is2FAEnabled(result.user.id);
+
+    if (twoFactorEnabled) {
+      // Si 2FA est activé, ne pas créer de session complète
+      // Retourner un statut indiquant qu'un code 2FA est requis
+      return NextResponse.json({
+        requires2FA: true,
+        message: 'Code de vérification requis',
+        email: result.user.email,
+        userName: result.user.name,
+      });
+    }
+
+    // Si pas de 2FA, créer la session normale
     const response = NextResponse.json({
       message: 'Login successful',
       user: result.user,

@@ -11,7 +11,7 @@ export default function AdminLayout({
   const pathname = usePathname();
   
   // Routes publiques qui ne nécessitent pas de session
-  const publicRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password'];
+  const publicRoutes = ['/admin/login', '/admin/forgot-password', '/admin/reset-password', '/admin/verify-2fa'];
   const isPublicRoute = publicRoutes.some(route => pathname?.startsWith(route));
 
   // Ne pas wrapper avec SessionManager pour les routes publiques
