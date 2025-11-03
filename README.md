@@ -1,394 +1,859 @@
-﻿# 🎓 USTHB Recours - Système de Demande de Changement de Spécialité
+﻿# 🎓 USTHB Recours
 
 <div align="center">
 
 ![USTHB Logo](public/logo-usthb.png)
 
-**Université des Sciences et de Technologie Houari Boumediene**  
-*Faculté d'Informatique - Système de Gestion des Demandes de Changement de Spécialité*
+**Système de Gestion des Demandes de Changement de Spécialité**  
+*Université des Sciences et de Technologie Houari Boumediene - Faculté d'Informatique*
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.5.4-black.svg)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19.1.0-blue.svg)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4.svg)](https://tailwindcss.com/)
-[![Netlify](https://img.shields.io/badge/Deployment-Netlify-00C7B7.svg)](https://netlify.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.5.4-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.1.0-61DAFB?logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-4169E1?logo=postgresql)](https://supabase.com/)
+[![Netlify](https://img.shields.io/badge/Deploy-Netlify-00C7B7?logo=netlify)](https://netlify.com/)
+
+[🚀 Demo Live](#) • [📖 Documentation](#documentation) • [🐛 Report Bug](../../issues) • [✨ Request Feature](../../issues)
 
 </div>
 
-## 📖 Aperçu
+---
 
-Système web moderne et responsive permettant aux étudiants de l'USTHB de soumettre des demandes de changement de spécialité en ligne, avec un panel d'administration complet pour la gestion et le suivi des demandes.
+## � Table des Matières
 
-**🗓️ Statut du Projet :** Actif et en production depuis septembre 2025  
-**🔧 Version Actuelle :** 0.1.0  
-**📊 État :** Toutes les fonctionnalités implémentées et testées
+- [À Propos](#-à-propos)
+- [Fonctionnalités](#-fonctionnalités)
+- [Technologies](#-technologies)
+- [Prérequis](#-prérequis)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Utilisation](#-utilisation)
+- [Architecture](#-architecture)
+- [Déploiement](#-déploiement)
+- [Captures d'Écran](#-captures-décran)
+- [Contribution](#-contribution)
+- [License](#-license)
 
-### 🌟 Fonctionnalités Principales
+---
 
-#### 👨‍🎓 **Interface Étudiante**
-- ✅ **Formulaire intelligent** - Recherche automatique des informations étudiantes par matricule
-- ✅ **Validation temps réel** - Vérification instantanée des données
-- ✅ **Confirmation par email** - Notification automatique de soumission
-- ✅ **Interface responsive** - Compatible mobile, tablette et desktop
-- ✅ **Notifications intégrées** - Système d'alertes élégant sans popups
+## 🎯 À Propos
 
-#### 🛡️ **Panel d'Administration**
-- ✅ **Gestion des demandes** - Vue d'ensemble avec filtres et tri
-- ✅ **Approbation/Rejet** - Traitement en un clic avec commentaires
-- ✅ **Transfert automatique** - Mise à jour automatique de la spécialité en base
-- ✅ **Notifications emails** - Alertes automatiques aux étudiants
-- ✅ **Suppression en masse** - Sélection multiple avec confirmation
-- ✅ **Interface responsive** - Optimisée pour tous les appareils
+**USTHB Recours** est une application web moderne développée pour digitaliser et automatiser le processus de demande de changement de spécialité à la Faculté d'Informatique de l'USTHB. Le système offre une interface intuitive pour les étudiants et un panneau d'administration complet pour le traitement efficace des demandes.
 
-#### 🔄 **Processus Automatisé**
-- ✅ **Transfert étudiant** - Changement automatique de spécialité lors de l'approbation
-- ✅ **Emails enrichis** - Templates HTML responsive avec confirmation de transfert
-- ✅ **Traçabilité complète** - Historique des actions et timestamps
-- ✅ **Gestion d'erreurs** - Robustesse et récupération automatique
+### 🎯 Objectifs
 
-## 🛠️ Stack Technique
+- **Simplifier** le processus de demande de changement de spécialité
+- **Automatiser** le traitement et le transfert des étudiants
+- **Centraliser** la gestion administrative des demandes
+- **Améliorer** la communication avec les étudiants via notifications automatiques
+- **Garantir** la traçabilité et la sécurité des données
+
+### ✨ Points Forts
+
+- 🚀 **Performance** - Application rapide avec Next.js 15 et Turbopack
+- 📱 **Responsive** - Interface adaptée mobile, tablette et desktop
+- 🎨 **UI/UX Moderne** - Design élégant avec Tailwind CSS 4
+- 🔒 **Sécurisé** - Authentification JWT, hashage bcrypt, HTTPS
+- ⚡ **Temps Réel** - Validation instantanée et mises à jour automatiques
+- 📧 **Notifications** - Emails HTML automatiques avec templates professionnels
+- 🔄 **Automatisation** - Transfert automatique et mise à jour base de données
+
+---
+
+## ✨ Fonctionnalités
+
+### 👨‍🎓 Portail Étudiant
+
+#### 📝 Soumission de Demande
+- **Recherche automatique** par matricule depuis la base de données
+- **Auto-complétion** des informations (nom, prénom, email, téléphone, spécialité actuelle)
+- **Validation en temps réel** avec messages d'erreur contextuels
+- **Upload sécurisé** de justificatifs (si nécessaire)
+- **Confirmation visuelle** avec animation de succès
+
+#### 📧 Notifications Email
+- **Email de confirmation** immédiat après soumission
+- **Email de décision** (approbation/rejet) avec détails
+- **Email de transfert** avec nouvelle spécialité confirmée
+- **Templates HTML** responsive et professionnels
+
+### 🛡️ Panneau d'Administration
+
+#### 🔐 Système d'Authentification
+- **Login sécurisé** avec JWT et sessions
+- **4 rôles d'accès** : Viewer, Reviewer, Department Admin, Super Admin
+- **14 permissions granulaires** pour contrôle d'accès fin
+- **Gestion des utilisateurs** (création, modification, désactivation)
+- **Audit logs** pour traçabilité complète
+
+#### 📊 Gestion des Demandes
+- **Dashboard centralisé** avec statistiques en temps réel
+- **Filtrage avancé** par statut, spécialité, date
+- **Vue détaillée** de chaque demande avec historique
+- **Actions en masse** (sélection multiple, suppression groupée)
+- **Traitement rapide** (approuver/rejeter en un clic)
+
+#### 🔄 Automatisation
+- **Transfert automatique** de l'étudiant vers la nouvelle spécialité
+- **Mise à jour base de données** instantanée
+- **Envoi d'emails** automatique selon la décision
+- **Gestion d'erreurs** robuste avec rollback
+
+#### 👥 Gestion Utilisateurs (Super Admin)
+- **CRUD complet** des comptes administrateurs
+- **Attribution des rôles** et permissions
+- **Activation/désactivation** des comptes
+- **Sécurité renforcée** avec verrouillage après échecs de connexion
+- **Génération de mots de passe** sécurisés
+
+---
+
+## 🛠️ Technologies
 
 ### **Frontend**
-- **Next.js 15.5.4** - Framework React full-stack avec App Router
-- **React 19.1.0** - Bibliothèque UI avec hooks et composants modernes
-- **TypeScript 5** - Typage statique pour la robustesse du code
-- **Tailwind CSS 4** - Framework CSS utility-first pour design moderne
-- **Responsive Design** - Mobile-first avec breakpoints optimisés
+- **[Next.js 15.5.4](https://nextjs.org/)** - Framework React avec App Router et Turbopack
+- **[React 19.1.0](https://react.dev/)** - Bibliothèque UI avec Server Components
+- **[TypeScript 5](https://www.typescriptlang.org/)** - Typage statique pour code robuste
+- **[Tailwind CSS 4](https://tailwindcss.com/)** - Framework CSS utility-first moderne
 
-### **Backend**
-- **Netlify Functions** - API serverless avec Node.js
-- **PostgreSQL** - Base de données relationnelle avec Supabase
-- **Nodemailer** - Service d'envoi d'emails avec Gmail SMTP
-- **Supabase Client** - ORM et gestion base de données
-- **pg** - Driver PostgreSQL natif pour les functions
+### **Backend & Database**
+- **[PostgreSQL](https://www.postgresql.org/)** - Base de données relationnelle
+- **[Supabase](https://supabase.com/)** - Backend-as-a-Service avec PostgreSQL managé
+- **[Netlify Functions](https://www.netlify.com/products/functions/)** - Serverless functions pour API
+- **[Nodemailer](https://nodemailer.com/)** - Service d'envoi d'emails SMTP
 
-### **Infrastructure**
-- **Netlify** - Déploiement automatique avec CI/CD
-- **Supabase** - BaaS avec PostgreSQL managé
-- **GitHub** - Contrôle de version et collaboration
-- **SSL/HTTPS** - Sécurisé par défaut
+### **Authentification & Sécurité**
+- **[JWT (jose)](https://github.com/panva/jose)** - JSON Web Tokens pour sessions
+- **[bcryptjs](https://github.com/dcodeIO/bcrypt.js)** - Hashage sécurisé des mots de passe
+- **Row Level Security (RLS)** - Sécurité au niveau base de données
+- **HTTPS** - Communication chiffrée obligatoire
 
-### **Dépendances Principales**
-```json
-{
-  "dependencies": {
-    "@supabase/supabase-js": "^2.58.0",
-    "dotenv": "^17.2.2", 
-    "next": "15.5.4",
-    "nodemailer": "^7.0.6",
-    "pg": "^8.16.3",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
-  },
-  "devDependencies": {
-    "@netlify/plugin-nextjs": "^5.7.2",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "typescript": "^5",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.4"
-  }
-}
-```
+### **Outils de Développement**
+- **[ESLint 9](https://eslint.org/)** - Linting et qualité du code
+- **[PostCSS](https://postcss.org/)** - Transformation CSS
+- **Git & GitHub** - Contrôle de version
+- **VS Code** - IDE recommandé
 
-## 🚀 Installation et Développement
+---
 
-### **Prérequis**
-- Node.js 18+ 
-- npm ou yarn
-- Compte Supabase (base de données)
-- Compte Gmail (envoi d'emails)
+## 📦 Prérequis
 
-### **1. Cloner le Projet**
+Avant de commencer, assurez-vous d'avoir installé :
+
+- **Node.js** 20.x ou supérieur ([Télécharger](https://nodejs.org/))
+- **npm** 10.x ou supérieur (inclus avec Node.js)
+- **Git** pour le contrôle de version ([Télécharger](https://git-scm.com/))
+- **PostgreSQL** ou compte Supabase ([Créer un compte](https://supabase.com/))
+- **Compte Gmail** avec App Password pour l'envoi d'emails
+
+### Comptes Requis
+
+1. **[Supabase](https://supabase.com/)** - Base de données PostgreSQL managée
+2. **[Netlify](https://www.netlify.com/)** - Hébergement et déploiement (optionnel)
+3. **[Gmail](https://mail.google.com/)** - Pour l'envoi d'emails
+
+---
+
+## 🚀 Installation
+
+### 1. Cloner le Repository
+
 ```bash
 git clone https://github.com/rh0kzy/recours.git
 cd recours
 ```
 
-### **2. Installer les Dépendances**
+### 2. Installer les Dépendances
+
 ```bash
 npm install
 ```
 
-### **3. Configuration Environnement**
-Créer `.env.local` à la racine :
+### 3. Configuration de la Base de Données
+
+#### a) Créer un Projet Supabase
+
+1. Allez sur [supabase.com](https://supabase.com/)
+2. Créez un nouveau projet
+3. Notez l'URL et les clés API
+
+#### b) Exécuter les Migrations
+
+Connectez-vous à votre base Supabase et exécutez les scripts SQL dans l'ordre :
+
+```bash
+# 1. Créer les tables et permissions
+database/admin_roles_migration.sql
+
+# 2. Créer le compte admin par défaut
+database/create_default_admin.sql
+```
+
+### 4. Configuration des Variables d'Environnement
+
+Créez un fichier `.env.local` à la racine :
+
+```bash
+cp .env.example .env.local
+```
+
+Éditez `.env.local` avec vos valeurs :
+
 ```env
-# Base de données Supabase
-DATABASE_URL=postgresql://user:password@host:port/database
+# Database - PostgreSQL Connection
+DATABASE_URL=postgresql://user:password@host:5432/database
 
-# Configuration Email Gmail
-EMAIL_USER=votre-email@gmail.com
-EMAIL_APP_PASSWORD=mot-de-passe-application-gmail
+# Email Configuration
+EMAIL_USER=your-email@gmail.com
+EMAIL_APP_PASSWORD=your-app-password
 
-# Variables optionnelles
-NODE_ENV=development
+# JWT Secret (générer avec: openssl rand -base64 32)
+JWT_SECRET=your-secure-random-jwt-secret-here
+
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_ANON_KEY=your-anon-key
 ```
 
-### **4. Configuration Base de Données**
-Exécuter les scripts SQL dans Supabase :
+#### 📧 Configuration Gmail
 
-```sql
--- Table des étudiants
-CREATE TABLE students (
-  id SERIAL PRIMARY KEY,
-  matricule TEXT UNIQUE NOT NULL,
-  nom TEXT NOT NULL,
-  prenom TEXT NOT NULL,
-  email TEXT NOT NULL,
-  specialite TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+1. Activez l'authentification à deux facteurs sur votre compte Gmail
+2. Générez un mot de passe d'application : [Google App Passwords](https://myaccount.google.com/apppasswords)
+3. Utilisez ce mot de passe dans `EMAIL_APP_PASSWORD`
 
--- Table des demandes
-CREATE TABLE requests (
-  id SERIAL PRIMARY KEY,
-  matricule TEXT NOT NULL,
-  nom TEXT NOT NULL,
-  prenom TEXT NOT NULL,
-  email TEXT NOT NULL,
-  telephone TEXT,
-  specialite_actuelle TEXT NOT NULL,
-  specialite_souhaitee TEXT NOT NULL,
-  raison TEXT NOT NULL,
-  status TEXT DEFAULT 'pending',
-  admin_comment TEXT,
-  created_at TIMESTAMP DEFAULT NOW(),
-  reviewed_at TIMESTAMP,
-  reviewed_by TEXT,
-  FOREIGN KEY (matricule) REFERENCES students(matricule)
-);
-```
+### 5. Lancer l'Application
 
-### **5. Lancer le Développement**
+#### Mode Développement
+
 ```bash
 npm run dev
 ```
 
-Accéder à :
-- **Site principal** : http://localhost:3000
-- **Panel admin** : http://localhost:3000/admin
+L'application sera accessible sur `http://localhost:3000`
 
-## 🌐 Déploiement Production
+#### Mode Production (Build)
 
-### **Netlify (Recommandé)**
+```bash
+npm run build
+npm start
+```
 
-1. **Connexion GitHub**
-   ```bash
-   git push origin master
-   ```
+---
 
-2. **Configuration Netlify**
-   - Build command: `npm run build`
-   - Functions directory: `netlify/functions`
-   - Publish directory: `.next`
-   - Node version: `18`
-   - Plugin: `@netlify/plugin-nextjs`
+## ⚙️ Configuration
 
-3. **Variables d'Environnement**
-   ```env
-   DATABASE_URL=votre_url_supabase
-   EMAIL_USER=votre_email@gmail.com
-   EMAIL_APP_PASSWORD=votre_mot_de_passe_app
-   NODE_VERSION=18
-   ```
-
-4. **Déploiement Automatique**
-   - Push → Build automatique → Déploiement
-
-### **Configuration Gmail**
-1. Activer l'authentification 2FA sur Gmail
-2. Générer un mot de passe d'application : [Guide Google](https://support.google.com/accounts/answer/185833)
-3. Utiliser ce mot de passe dans `EMAIL_APP_PASSWORD`
-
-## 📂 Structure du Projet
+### Structure des Fichiers de Configuration
 
 ```
 recours/
-├── 📁 src/
-│   ├── 📁 app/
-│   │   ├── 📄 page.tsx              # Page d'accueil avec formulaire
-│   │   ├── � layout.tsx            # Layout principal de l'app
-│   │   ├── 📄 not-found.tsx         # Page 404 personnalisée
-│   │   ├── 📄 globals.css           # Styles globaux Tailwind
-│   │   ├── �📁 admin/
-│   │   │   └── 📄 page.tsx          # Panel d'administration
-│   │   └── 📁 api/
-│   │       ├── 📁 admin/requests/   # APIs admin
-│   │       │   ├── 📄 route.ts      # GET/POST requests admin
-│   │       │   └── 📁 [id]/
-│   │       │       └── 📄 route.ts  # PATCH/DELETE request spécifique
-│   │       ├── 📁 student/          # API recherche étudiant
-│   │       │   └── � route.ts      # GET étudiant par matricule
-│   │       ├── �📁 students/         # API liste étudiants
-│   │       │   └── 📄 route.ts      # GET tous les étudiants
-│   │       ├── 📁 submit-request/   # API soumission
-│   │       │   └── 📄 route.ts      # POST nouvelle demande
-│   │       ├── 📁 test/             # API test
-│   │       │   └── 📄 route.ts      # GET test connectivité
-│   │       ├── 📁 test-db/          # API test DB
-│   │       │   └── 📄 route.ts      # GET test base de données
-│   │       ├── 📁 test-student-update/ # API test mise à jour
-│   │       │   └── 📄 route.ts      # POST test transfert étudiant
-│   │       └── 📁 update-requests-table/ # API mise à jour table
-│   │           └── 📄 route.ts      # POST mise à jour structure DB
-│   ├── 📁 components/
-│   │   └── 📄 RequestForm.tsx       # Formulaire principal responsive
-│   └── 📁 lib/
-│       ├── 📄 supabase.ts          # Configuration Supabase
-│       └── 📄 email.ts             # Utilitaires email
-├── 📁 netlify/
-│   └── 📁 functions/               # Functions serverless
-│       ├── 📄 admin-requests.js    # GET/POST demandes admin
-│       ├── 📄 admin-requests-id.js # PATCH/DELETE demande spécifique
-│       ├── 📄 submit-request.js    # POST soumission avec emails
-│       ├── 📄 test.js              # Test de connectivité
-│       ├── 📄 test-db-connection.js # Test connexion DB
-│       ├── 📄 test-email.js        # Test service email
-│       ├── 📄 health.js            # Health check
-│       ├── 📄 setup-database.js    # Script initialisation DB
-│       └── 📄 package.json         # Dépendances functions
-├── 📁 public/                      # Assets statiques
-│   ├── 📄 logo-usthb.png          # Logo principal USTHB
-│   ├── 📄 LogoUSTHB.png           # Logo alternatif
-│   ├── 📄 favicon.ico             # Icône du site
-│   ├── 📄 _redirects              # Règles redirect Netlify
-│   └── 📄 *.svg                   # Icônes diverses
-├── 📄 netlify.toml                # Config déploiement Netlify
-├── 📄 next.config.ts              # Configuration Next.js
-├── 📄 tailwind.config.ts          # Configuration Tailwind CSS
-├── 📄 tsconfig.json               # Configuration TypeScript
-├── 📄 eslint.config.mjs           # Configuration ESLint
-├── 📄 postcss.config.mjs          # Configuration PostCSS
-├── 📄 package.json                # Dépendances et scripts
-├── 📄 DEPLOYMENT.md               # Guide de déploiement
-├── 📄 RESPONSIVE_TEST.md          # Tests responsivité
-├── 📄 DEBUG_500_ERROR.md          # Guide debug erreurs
-└── 📄 README.md                   # Documentation complète
+├── .env.local              # Variables d'environnement (ne pas commit)
+├── .env.example            # Template des variables d'environnement
+├── next.config.ts          # Configuration Next.js
+├── tailwind.config.ts      # Configuration Tailwind CSS
+├── tsconfig.json           # Configuration TypeScript
+├── netlify.toml            # Configuration Netlify
+└── package.json            # Dépendances et scripts
 ```
 
-## 🔌 API Endpoints
+### Scripts NPM Disponibles
 
-### **Étudiants**
-- `GET /api/student?matricule={matricule}` - Recherche étudiant par matricule
-- `GET /api/students` - Liste de tous les étudiants
-- `POST /api/submit-request` - Soumission nouvelle demande
-- `GET /api/test` - Test de connectivité API
-- `GET /api/test-db` - Test connexion base de données
-- `POST /api/test-student-update` - Test transfert étudiant
-- `POST /api/update-requests-table` - Mise à jour structure table
+```json
+{
+  "dev": "next dev --turbopack",        // Développement avec Turbopack
+  "build": "next build --turbopack",    // Build production
+  "start": "next start",                 // Démarrer le serveur production
+  "lint": "eslint",                      // Vérifier le code
+  "netlify": "netlify dev"               // Développement local Netlify
+}
+```
 
-### **Administration**
-- `GET /api/admin/requests` - Liste des demandes avec filtres
-- `POST /api/admin/requests` - Création demande (admin)
-- `PATCH /api/admin/requests/[id]` - Mise à jour statut/décision
-- `DELETE /api/admin/requests/[id]` - Suppression demande
+---
 
-### **Netlify Functions** (Production)
-- `/.netlify/functions/admin-requests` - Gestion demandes admin
-- `/.netlify/functions/admin-requests-id` - Actions demande spécifique
-- `/.netlify/functions/submit-request` - Soumission avec emails
-- `/.netlify/functions/test` - Test connectivité
-- `/.netlify/functions/test-db-connection` - Test base de données
-- `/.netlify/functions/test-email` - Test service email
-- `/.netlify/functions/health` - Health check système
-- `/.netlify/functions/setup-database` - Initialisation DB
+## 💻 Utilisation
 
-## 📱 Responsive Design
+### Pour les Étudiants
 
-### **Breakpoints Tailwind**
-- **Mobile** : < 640px
-- **SM** : ≥ 640px (tablettes)
-- **MD** : ≥ 768px (tablettes larges)
-- **LG** : ≥ 1024px (laptops)
-- **XL** : ≥ 1280px (desktops)
+1. **Accéder au formulaire** : Visitez la page d'accueil
+2. **Entrer le matricule** : Le système charge automatiquement vos informations
+3. **Remplir le formulaire** : 
+   - Spécialité souhaitée (liste déroulante)
+   - Raison du changement (texte libre)
+4. **Soumettre** : Cliquez sur "Soumettre la demande"
+5. **Confirmation** : Recevez un email de confirmation immédiat
 
-### **Compatibilité Testée**
-- ✅ iOS Safari (iPhone/iPad)
-- ✅ Android Chrome
-- ✅ Desktop Chrome/Firefox/Safari/Edge
-- ✅ Tablettes toutes orientations
+### Pour les Administrateurs
 
-## 🔧 Scripts Disponibles
+#### Première Connexion
+
+**Compte par défaut créé lors de la migration :**
+- Email : `admin@usthb.dz`
+- Mot de passe : `Admin123!`
+- Rôle : Super Admin
+
+⚠️ **Important** : Changez ce mot de passe dès la première connexion !
+
+#### Accès au Panneau Admin
+
+1. **Se connecter** : `/admin/login`
+2. **Dashboard** : Vue d'ensemble des demandes
+3. **Traiter une demande** :
+   - Cliquer sur une demande pour voir les détails
+   - Ajouter un commentaire (optionnel)
+   - Cliquer sur "Approuver" ou "Refuser"
+   - Le système envoie automatiquement un email à l'étudiant
+
+#### Gestion des Utilisateurs (Super Admin)
+
+1. Accéder à **Utilisateurs** dans la navigation
+2. Créer un nouvel utilisateur avec :
+   - Nom complet
+   - Email
+   - Mot de passe sécurisé
+   - Rôle approprié
+   - Département (si applicable)
+
+### Rôles et Permissions
+
+| Rôle | Permissions |
+|------|------------|
+| **Viewer** 👁️ | Voir les demandes uniquement |
+| **Reviewer** ✅ | Voir + Approuver/Refuser |
+| **Department Admin** 🏢 | Reviewer + Gérer son département |
+| **Super Admin** 👑 | Accès complet + Gestion utilisateurs |
+
+---
+
+## 🏗️ Architecture
+
+### Structure du Projet
+
+```
+recours/
+├── src/
+│   ├── app/                      # Next.js App Router
+│   │   ├── page.tsx              # Page d'accueil (formulaire étudiant)
+│   │   ├── layout.tsx            # Layout principal
+│   │   ├── globals.css           # Styles globaux
+│   │   ├── admin/                # Section administration
+│   │   │   ├── page.tsx          # Dashboard admin
+│   │   │   ├── login/            # Page de connexion
+│   │   │   └── users/            # Gestion utilisateurs
+│   │   └── api/                  # API Routes
+│   │       ├── auth/             # Authentification
+│   │       ├── admin/            # APIs admin
+│   │       ├── student/          # API étudiant
+│   │       └── submit-request/   # Soumission demandes
+│   ├── components/               # Composants React réutilisables
+│   │   ├── AdminHeader.tsx       # En-tête admin
+│   │   └── RequestForm.tsx       # Formulaire de demande
+│   └── lib/                      # Utilitaires et helpers
+│       ├── auth.ts               # Logique authentification
+│       ├── email.ts              # Service email
+│       ├── permissions.ts        # Système de permissions
+│       └── supabase.ts           # Client Supabase
+├── netlify/
+│   └── functions/                # Netlify Serverless Functions
+│       ├── submit-request.js     # Traiter soumissions
+│       ├── admin-requests.js     # Gérer demandes admin
+│       └── admin-requests-id.js  # Actions demandes individuelles
+├── database/                     # Scripts SQL
+│   ├── admin_roles_migration.sql # Schéma base de données
+│   └── create_default_admin.sql  # Compte admin par défaut
+├── public/                       # Assets statiques
+│   ├── logo-usthb.png
+│   └── favicon.ico
+├── .env.local                    # Variables d'environnement (local)
+├── .env.example                  # Template environnement
+├── netlify.toml                  # Configuration Netlify
+├── next.config.ts                # Configuration Next.js
+├── tailwind.config.ts            # Configuration Tailwind
+├── tsconfig.json                 # Configuration TypeScript
+└── package.json                  # Dépendances NPM
+```
+
+### Schéma de Base de Données
+
+#### Table: `students`
+```sql
+id (SERIAL PRIMARY KEY)
+matricule (VARCHAR UNIQUE) - Identifiant étudiant
+nom, prenom, email, telephone
+specialite_actuelle - Spécialité en cours
+```
+
+#### Table: `recours_requests`
+```sql
+id (SERIAL PRIMARY KEY)
+matricule, nom, prenom, email, telephone
+specialite_actuelle, specialite_souhaitee
+raison - Justification du changement
+status (ENUM: pending, approved, rejected)
+admin_comment - Commentaire administrateur
+created_at, reviewed_at, reviewed_by
+```
+
+#### Table: `admin_users`
+```sql
+id (UUID PRIMARY KEY)
+name, email, password_hash
+role (ENUM: viewer, reviewer, super_admin, department_admin)
+department, is_active
+failed_login_attempts, locked_until
+created_at, updated_at
+```
+
+#### Table: `admin_sessions`
+```sql
+id (UUID PRIMARY KEY)
+admin_user_id (FK → admin_users)
+token, expires_at, ip_address, user_agent
+created_at
+```
+
+#### Table: `audit_logs`
+```sql
+id (UUID PRIMARY KEY)
+admin_user_id (FK → admin_users)
+action, resource_type, resource_id
+details (JSONB), ip_address, user_agent
+created_at
+```
+
+### Flux de Données
+
+#### Soumission de Demande (Étudiant)
+```
+1. Étudiant entre matricule
+   ↓
+2. API vérifie en base → Retourne infos
+   ↓
+3. Étudiant complète et soumet
+   ↓
+4. API valide et enregistre
+   ↓
+5. Email de confirmation envoyé
+   ↓
+6. Demande visible dans admin
+```
+
+#### Traitement de Demande (Admin)
+```
+1. Admin se connecte (JWT)
+   ↓
+2. Liste des demandes chargée
+   ↓
+3. Admin clique sur demande
+   ↓
+4. Détails affichés
+   ↓
+5. Admin approuve/refuse
+   ↓
+6. Si approuvé:
+   - Spécialité de l'étudiant mise à jour
+   - Email de confirmation envoyé
+   ↓
+7. Si refusé:
+   - Email de notification envoyé
+   ↓
+8. Statut demande mis à jour
+   ↓
+9. Action loguée dans audit_logs
+```
+
+---
+
+## 🚢 Déploiement
+
+### Déploiement sur Netlify
+
+#### 1. Préparer le Projet
 
 ```bash
-# Développement
-npm run dev          # Serveur de développement avec Turbopack
-npm run build        # Build production avec Turbopack
-npm run start        # Serveur production
-npm run lint         # Vérification ESLint
-npm run netlify      # Serveur Netlify dev local
+# S'assurer que le build fonctionne localement
+npm run build
 
-# Note: Turbopack activé pour des builds plus rapides
+# Créer un compte Netlify si nécessaire
 ```
 
-## 🔒 Sécurité
+#### 2. Configuration Netlify
 
-- ✅ **HTTPS Obligatoire** - SSL/TLS par défaut
-- ✅ **Validation Côté Serveur** - Tous les inputs validés
-- ✅ **Sanitisation des Données** - Protection contre XSS
-- ✅ **Variables d'Environnement** - Secrets sécurisés
-- ✅ **CORS Configuré** - Accès contrôlé aux APIs
+Le fichier `netlify.toml` est déjà configuré :
 
-## 🧪 Tests et Validation
+```toml
+[build]
+  command = "npm run build"
+  functions = "netlify/functions"
+  publish = ".next"
 
-### **Tests Manuels Effectués**
-- ✅ Soumission de demandes avec validation email
-- ✅ Notifications emails responsive (étudiant + admin)
-- ✅ Interface admin complète avec toutes les actions
-- ✅ Responsivité multi-appareils (mobile, tablette, desktop)
-- ✅ Transfert automatique des étudiants lors d'approbation
-- ✅ Système de notifications intégré (remplacement des alertes)
-- ✅ Gestion d'erreurs et récupération automatique
-- ✅ Performance avec Turbopack en développement et production
+[build.environment]
+  NODE_VERSION = "20"
+```
 
-### **Documentation Projet**
-- 📄 `RESPONSIVE_TEST.md` - Rapport complet de tests responsivité
-- 📄 `DEPLOYMENT.md` - Guide détaillé de déploiement
-- 📄 `DEBUG_500_ERROR.md` - Guide de résolution d'erreurs
-- 📄 `README.md` - Documentation complète (ce fichier)
+#### 3. Variables d'Environnement Netlify
 
-### **Validation Responsivité**
-Voir [RESPONSIVE_TEST.md](RESPONSIVE_TEST.md) pour le rapport complet.
+Dans Netlify Dashboard → Site Settings → Environment variables, ajoutez :
 
-## 🚀 Fonctionnalités Avancées
+```env
+DATABASE_URL=<votre-connection-string>
+EMAIL_USER=<votre-email>
+EMAIL_APP_PASSWORD=<app-password>
+JWT_SECRET=<secret-aleatoire>
+NEXT_PUBLIC_SUPABASE_URL=<url-supabase>
+SUPABASE_SERVICE_ROLE_KEY=<key-service>
+SUPABASE_ANON_KEY=<key-anon>
+NODE_VERSION=20
+```
 
-### **Notifications Intelligentes**
-- Système de notifications intégré (remplace les alertes navigateur)
-- Auto-suppression après 5 secondes
-- Types : Succès, Erreur, Avertissement, Info
-- Position adaptative mobile/desktop
+#### 4. Déployer
 
-### **Transfert Automatique**
-- Mise à jour automatique de la spécialité en base lors de l'approbation
-- Emails enrichis avec confirmation de transfert
-- Gestion d'erreurs robuste avec logs
+**Option A: Via Git**
+```bash
+git push origin master
+# Netlify détecte automatiquement et déploie
+```
 
-### **Interface Admin Avancée**
-- Sélection multiple avec actions en masse
-- Filtrage et tri intelligent
-- Mode sélection avec compteurs
-- Historique complet des actions
+**Option B: Via Netlify CLI**
+```bash
+npm install -g netlify-cli
+netlify login
+netlify deploy --prod
+```
 
-## 📞 Support et Contact
+#### 5. Vérifier le Déploiement
 
-### **Développeur**
-- **GitHub** : [@rh0kzy](https://github.com/rh0kzy)
-- **Repository** : [recours](https://github.com/rh0kzy/recours)
+1. Vérifier que le build réussit
+2. Tester le formulaire étudiant
+3. Tester la connexion admin
+4. Vérifier l'envoi d'emails
 
-### **USTHB - Faculté d'Informatique**
-- **Site Web** : [usthb.dz](https://usthb.dz)
-- **Email** : contact@usthb.dz
+### Déploiement sur Vercel (Alternative)
 
-## 📄 Licence
+```bash
+npm install -g vercel
+vercel login
+vercel --prod
+```
 
-Ce projet est propriétaire et confidentiel.  
-© 2025 USTHB - Faculté d'Informatique. Tous droits réservés.
+### Maintenance Post-Déploiement
+
+- 🔍 **Monitoring** : Surveiller les logs Netlify/Vercel
+- 📧 **Emails** : Vérifier la délivrabilité des emails
+- 💾 **Base de données** : Backups réguliers via Supabase
+- 🔐 **Sécurité** : Rotations des secrets tous les 90 jours
+
+---
+
+## 📸 Captures d'Écran
+
+### Interface Étudiant
+
+<div align="center">
+
+**Page d'Accueil - Formulaire de Demande**
+
+*Interface moderne et intuitive pour soumettre une demande de changement de spécialité*
+
+</div>
+
+### Panneau d'Administration
+
+<div align="center">
+
+**Connexion Admin**
+
+**Dashboard Principal**
+
+**Gestion des Utilisateurs**
+
+</div>
+
+> **Note** : Les captures d'écran seront ajoutées dans le dossier `docs/screenshots/`
+
+---
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Suivez ces étapes :
+
+### 1. Fork le Projet
+
+```bash
+git clone https://github.com/rh0kzy/recours.git
+```
+
+### 2. Créer une Branche
+
+```bash
+git checkout -b feature/AmazingFeature
+```
+
+### 3. Commit les Changements
+
+```bash
+git commit -m "Add: Amazing new feature"
+```
+
+### 4. Push vers la Branche
+
+```bash
+git push origin feature/AmazingFeature
+```
+
+### 5. Ouvrir une Pull Request
+
+Décrivez vos changements en détail dans la PR.
+
+### Guidelines
+
+- ✅ Suivre les conventions de code existantes
+- ✅ Ajouter des tests pour les nouvelles fonctionnalités
+- ✅ Mettre à jour la documentation si nécessaire
+- ✅ S'assurer que `npm run lint` passe
+- ✅ Tester localement avant de soumettre
+
+---
+
+## 📄 License
+
+Ce projet est sous licence **MIT**. Voir le fichier `LICENSE` pour plus de détails.
+
+```
+MIT License
+
+Copyright (c) 2025 USTHB - Faculté d'Informatique
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+---
+
+## 👥 Auteurs
+
+**Développement & Design**
+- [@rh0kzy](https://github.com/rh0kzy)
+
+**Organisation**
+- **USTHB** - Université des Sciences et de Technologie Houari Boumediene
+- **Faculté d'Informatique**
+
+---
+
+## 🙏 Remerciements
+
+- [Next.js](https://nextjs.org/) - Framework React moderne
+- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS utility-first
+- [Supabase](https://supabase.com/) - Backend-as-a-Service
+- [Netlify](https://www.netlify.com/) - Plateforme de déploiement
+- [Nodemailer](https://nodemailer.com/) - Service d'envoi d'emails
+- Communauté open-source pour les bibliothèques utilisées
+
+---
+
+## 📞 Support
+
+Pour toute question ou problème :
+
+- 📧 **Email** : support@usthb.dz
+- 🐛 **Issues** : [GitHub Issues](https://github.com/rh0kzy/recours/issues)
+- 📖 **Documentation** : [Wiki](https://github.com/rh0kzy/recours/wiki)
+
+---
+
+## 🔄 Changelog
+
+### Version 1.0.0 (Janvier 2025)
+
+#### ✨ Nouvelles Fonctionnalités
+- Interface étudiant complète avec formulaire intelligent
+- Panneau d'administration avec dashboard responsive
+- Système d'authentification multi-rôles (JWT + Sessions)
+- Gestion des utilisateurs admin (CRUD complet)
+- Transfert automatique des étudiants
+- Service d'emails avec templates HTML
+- Validation en temps réel
+- Actions en masse (sélection multiple)
+- Audit logs pour traçabilité
+
+#### 🎨 Design
+- UI moderne avec Tailwind CSS 4
+- Responsive mobile/tablette/desktop
+- Navbar admin avec glassmorphism
+- Animations et transitions fluides
+- Mode sombre élégant
+
+#### 🔧 Technique
+- Migration vers Next.js 15.5.4
+- Utilisation de React 19.1.0
+- TypeScript pour type-safety
+- Turbopack pour builds rapides
+- Architecture serverless avec Netlify Functions
+- PostgreSQL via Supabase
+
+#### 🔒 Sécurité
+- Authentification JWT avec expiration 30 minutes
+- Hachage bcrypt des mots de passe (10 rounds)
+- Protection CSRF avec tokens
+- Validation côté serveur stricte
+- HTTP-only cookies pour sessions
+- Rate limiting sur authentification
+- Audit complet des actions administratives
+
+---
+
+## 🔌 API Reference
+
+### Endpoints Étudiants
+
+#### `GET /api/student`
+Rechercher un étudiant par matricule
+
+**Query Parameters:**
+- `matricule` (string, required) - Matricule étudiant
+
+**Response:**
+```json
+{
+  "id": 1,
+  "matricule": "201234567",
+  "nom": "Benali",
+  "prenom": "Ahmed",
+  "email": "a.benali@usthb.dz",
+  "telephone": "0555123456",
+  "specialite_actuelle": "Informatique Générale"
+}
+```
+
+#### `POST /api/submit-request`
+Soumettre une nouvelle demande de changement
+
+**Body:**
+```json
+{
+  "matricule": "201234567",
+  "nom": "Benali",
+  "prenom": "Ahmed",
+  "email": "a.benali@usthb.dz",
+  "telephone": "0555123456",
+  "specialite_actuelle": "Informatique Générale",
+  "specialite_souhaitee": "Intelligence Artificielle",
+  "raison": "Passion pour l'IA et le machine learning..."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Demande soumise avec succès",
+  "requestId": 42
+}
+```
+
+### Endpoints Administration
+
+#### `GET /api/admin/requests`
+Liste des demandes (authentification requise)
+
+**Headers:**
+- `Authorization: Bearer <jwt_token>`
+
+**Query Parameters:**
+- `status` (string, optional) - Filtrer par statut (pending, approved, rejected)
+
+**Response:**
+```json
+{
+  "requests": [
+    {
+      "id": 42,
+      "matricule": "201234567",
+      "nom": "Benali",
+      "prenom": "Ahmed",
+      "status": "pending",
+      "specialite_actuelle": "Informatique Générale",
+      "specialite_souhaitee": "Intelligence Artificielle",
+      "created_at": "2025-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+#### `PATCH /api/admin/requests/[id]`
+Approuver ou refuser une demande
+
+**Headers:**
+- `Authorization: Bearer <jwt_token>`
+
+**Body:**
+```json
+{
+  "status": "approved",
+  "admin_comment": "Demande approuvée après étude du dossier"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Demande approuvée avec succès"
+}
+```
+
+---
+
+## 🧪 Tests
+
+### Tests Manuels
+
+```bash
+# Tester la connexion à la base de données
+curl http://localhost:3000/api/test-db
+
+# Tester l'envoi d'email
+curl -X POST http://localhost:3000/api/test-email \
+  -H "Content-Type: application/json" \
+  -d '{"to":"test@example.com"}'
+
+# Tester la recherche d'étudiant
+curl "http://localhost:3000/api/student?matricule=201234567"
+```
+
+### Validation de Sécurité
+
+- ✅ Protection contre injections SQL (paramètres préparés)
+- ✅ Validation stricte des inputs (zod/joi)
+- ✅ Sanitisation des données utilisateur
+- ✅ Protection CSRF
+- ✅ Rate limiting sur authentification
+- ✅ Logs d'audit complets
 
 ---
 
 <div align="center">
 
-**Développé avec ❤️ pour l'USTHB**  
-*Système moderne de gestion des demandes académiques*
+**⭐ Si ce projet vous est utile, n'hésitez pas à lui donner une étoile sur GitHub ! ⭐**
+
+Fait avec ❤️ par l'équipe USTHB
+
+[🔝 Retour en haut](#-usthb-recours)
 
 </div>
