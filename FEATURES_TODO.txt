@@ -5,10 +5,14 @@ FONCTIONNALITÉS À AJOUTER - SYSTÈME DE RECOURS
 🔐 SÉCURITÉ & AUTHENTICATION
 ============================
 
-1. Rate Limiting
-   - Limiter les tentatives de connexion (max 5 essais/15 min)
-   - Protéger les API contre les abus
-   - Déjà partiellement en place avec failed_login_attempts dans la DB
+1. ✅ Rate Limiting (TERMINÉ)
+   - ✅ Limiter les tentatives de connexion (max 5 essais/15 min)
+   - ✅ Utilise les colonnes failed_login_attempts et locked_until de la DB
+   - ✅ Verrouillage automatique du compte après 5 tentatives
+   - ✅ Déblocage automatique après 15 minutes
+   - ✅ Super admin peut débloquer manuellement
+   - ✅ API pour voir les comptes verrouillés
+   - [ ] TODO: Protéger les autres API contre les abus (si nécessaire)
 
 2. Session Timeout
    - Déconnexion automatique après 30 min d'inactivité

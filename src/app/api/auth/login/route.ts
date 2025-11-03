@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateAdmin } from '@/lib/auth';
 import { 
-  checkIpRateLimit, 
-  checkEmailRateLimit, 
-  recordFailedAttempt,
-  resetRateLimit,
+  checkAccountLock, 
+  recordFailedLoginAttempt,
+  resetFailedAttempts,
   formatTimeRemaining 
-} from '@/lib/rateLimit';
+} from '@/lib/rateLimitDB';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,31 +25,18 @@ export async function POST(request: NextRequest) {
                       'unknown';
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
-    // Vérifier le rate limiting par IP
-    const ipCheck = checkIpRateLimit(ipAddress);
-    if (!ipCheck.allowed) {
-      const timeRemaining = formatTimeRemaining(
-        (ipCheck.blockedUntil || Date.now()) - Date.now()
-      );
+    // Vérifier si le compte est verrouillé (basé sur la DB)
+    const accountCheck = await checkAccountLock(email);
+    if (!accountCheck.allowed) {
+      const timeRemaining = accountCheck.lockedUntil 
+        ? formatTimeRemaining(accountCheck.lockedUntil.getTime() - Date.now())
+        : '15 minutes';
+      
       return NextResponse.json(
         { 
-          error: `Trop de tentatives depuis cette adresse IP. Réessayez dans ${timeRemaining}.`,
-          retryAfter: ipCheck.blockedUntil 
-        },
-        { status: 429 }
-      );
-    }
-
-    // Vérifier le rate limiting par email
-    const emailCheck = checkEmailRateLimit(email);
-    if (!emailCheck.allowed) {
-      const timeRemaining = formatTimeRemaining(
-        (emailCheck.blockedUntil || Date.now()) - Date.now()
-      );
-      return NextResponse.json(
-        { 
-          error: `Trop de tentatives pour ce compte. Réessayez dans ${timeRemaining}.`,
-          retryAfter: emailCheck.blockedUntil 
+          error: accountCheck.message || `Compte verrouillé. Réessayez dans ${timeRemaining}.`,
+          remainingAttempts: 0,
+          lockedUntil: accountCheck.lockedUntil
         },
         { status: 429 }
       );
@@ -60,23 +46,23 @@ export async function POST(request: NextRequest) {
     const result = await authenticateAdmin(email, password, ipAddress, userAgent);
 
     if ('error' in result) {
-      // Enregistrer la tentative échouée
-      recordFailedAttempt(ipAddress, email);
+      // Enregistrer la tentative échouée dans la DB
+      await recordFailedLoginAttempt(email);
+      
+      // Recalculer les tentatives restantes après l'enregistrement
+      const updatedCheck = await checkAccountLock(email);
       
       return NextResponse.json(
         { 
           error: result.error,
-          remainingAttempts: Math.min(
-            ipCheck.remainingAttempts || 0,
-            emailCheck.remainingAttempts || 0
-          ) - 1
+          remainingAttempts: updatedCheck.remainingAttempts
         },
         { status: 401 }
       );
     }
 
-    // Réinitialiser le rate limiting en cas de succès
-    resetRateLimit(ipAddress, email);
+    // Réinitialiser les tentatives échouées en cas de succès
+    await resetFailedAttempts(email);
 
     // Create response with session cookie
     const response = NextResponse.json({
