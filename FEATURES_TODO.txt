@@ -48,9 +48,12 @@ FONCTIONNALITÉS À AJOUTER - SYSTÈME DE RECOURS
    - ✅ Protection contre les attaques de force brute
    - ✅ Détection automatique lors de la connexion
    - ✅ Invalidation des anciens codes lors de génération
+   - ✅ Option "Se souvenir de cet appareil" (30 jours)
+   - ✅ Bypass 2FA pour les appareils de confiance
+   - ✅ API pour gérer les appareils de confiance
+   - ✅ Révocation d'appareils (individuelle ou totale)
    - [ ] TODO: Authenticator app (Google Authenticator, Authy)
    - [ ] TODO: Recovery codes de secours
-   - [ ] TODO: Option "Se souvenir de cet appareil"
 
 
 📊 DASHBOARD & ANALYTICS

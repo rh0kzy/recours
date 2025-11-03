@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verify2FACode } from '@/lib/twoFactor';
 import { supabase } from '@/lib/supabase';
 import { createSession } from '@/lib/auth';
+import { createTrustedDevice } from '@/lib/trustedDevices';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, code } = await request.json();
+    const { email, code, rememberDevice } = await request.json();
 
-    console.log('🔐 2FA Verification Request:', { email, code: code?.length });
+    console.log('🔐 2FA Verification Request:', { email, code: code?.length, rememberDevice });
 
     if (!email || !code) {
       return NextResponse.json(
@@ -71,6 +72,26 @@ export async function POST(request: NextRequest) {
       maxAge: 30 * 60, // 30 minutes
       path: '/',
     });
+
+    // Si "Se souvenir de cet appareil" est coché, créer un device token
+    if (rememberDevice) {
+      const { token: deviceToken, expiresAt } = await createTrustedDevice(
+        user.id,
+        ipAddress,
+        userAgent
+      );
+
+      // Définir le cookie de confiance (30 jours)
+      response.cookies.set('device_trust', deviceToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60, // 30 jours
+        path: '/',
+      });
+
+      console.log('✅ Device trust cookie set, expires:', expiresAt.toISOString());
+    }
 
     return response;
   } catch (error) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateAdmin } from '@/lib/auth';
 import { is2FAEnabled } from '@/lib/twoFactor';
+import { verifyTrustedDevice } from '@/lib/trustedDevices';
 import { 
   checkAccountLock, 
   recordFailedLoginAttempt,
@@ -69,7 +70,32 @@ export async function POST(request: NextRequest) {
     const twoFactorEnabled = await is2FAEnabled(result.user.id);
 
     if (twoFactorEnabled) {
-      // Si 2FA est activé, ne pas créer de session complète
+      // Vérifier si l'appareil est de confiance
+      const deviceToken = request.cookies.get('device_trust')?.value;
+      const trustedDevice = await verifyTrustedDevice(result.user.id, deviceToken || '');
+
+      if (trustedDevice.trusted) {
+        console.log('✅ Trusted device detected, bypassing 2FA');
+        
+        // Appareil de confiance : connexion directe
+        const response = NextResponse.json({
+          message: 'Login successful (trusted device)',
+          user: result.user,
+        });
+
+        // Set HTTP-only cookie with token
+        response.cookies.set('admin_session', result.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 30 * 60, // 30 minutes
+          path: '/',
+        });
+
+        return response;
+      }
+
+      // Si 2FA est activé et appareil non fiable, ne pas créer de session complète
       // Retourner un statut indiquant qu'un code 2FA est requis
       return NextResponse.json({
         requires2FA: true,

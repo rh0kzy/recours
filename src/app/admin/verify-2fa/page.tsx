@@ -12,6 +12,7 @@ function Verify2FAContent() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [rememberDevice, setRememberDevice] = useState(false);
 
   const email = searchParams.get('email');
   const userName = searchParams.get('name');
@@ -40,7 +41,7 @@ function Verify2FAContent() {
       const response = await fetch('/api/auth/2fa/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email, code, rememberDevice }),
       });
 
       const data = await response.json();
@@ -147,6 +148,21 @@ function Verify2FAContent() {
             <p className="mt-2 text-xs text-gray-500 text-center">
               Entrez le code à 6 chiffres reçu par email
             </p>
+          </div>
+
+          {/* Remember Device Checkbox */}
+          <div className="flex items-center">
+            <input
+              id="remember-device"
+              name="remember-device"
+              type="checkbox"
+              checked={rememberDevice}
+              onChange={(e) => setRememberDevice(e.target.checked)}
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+            />
+            <label htmlFor="remember-device" className="ml-2 block text-sm text-gray-700">
+              Se souvenir de cet appareil pendant 30 jours
+            </label>
           </div>
 
           {/* Error Message */}
