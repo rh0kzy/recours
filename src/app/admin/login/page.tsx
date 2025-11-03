@@ -204,9 +204,9 @@ function LoginForm() {
               </div>
 
               <div className="text-xs sm:text-sm">
-                <a href="#" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
-                  Forgot password?
-                </a>
+                <Link href="/admin/forgot-password" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
+                  Mot de passe oublié ?
+                </Link>
               </div>
             </div>
 

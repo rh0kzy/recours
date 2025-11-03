@@ -4,9 +4,11 @@ import type { NextRequest } from 'next/server';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for login page and API auth routes
+  // Skip middleware for public admin pages and API auth routes
   if (
     pathname.startsWith('/admin/login') ||
+    pathname.startsWith('/admin/forgot-password') ||
+    pathname.startsWith('/admin/reset-password') ||
     pathname.startsWith('/api/auth')
   ) {
     return NextResponse.next();

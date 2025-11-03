@@ -174,3 +174,137 @@ export const sendSpecialtyChangeNotification = async (formData: {
     return false;
   }
 };
+
+/**
+ * Envoyer un email de réinitialisation de mot de passe
+ */
+export const sendPasswordResetEmail = async (
+  email: string,
+  name: string,
+  resetToken: string
+) => {
+  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/admin/reset-password?token=${resetToken}`;
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Réinitialisation de mot de passe - USTHB Admin',
+    html: `
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Réinitialisation de mot de passe</title>
+        <style>
+          @media screen and (max-width: 600px) {
+            .container { width: 100% !important; padding: 10px !important; }
+            .header { padding: 20px 15px !important; }
+            .content { padding: 20px 15px !important; }
+            h1 { font-size: 20px !important; }
+            h2 { font-size: 18px !important; }
+          }
+        </style>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+        <div class="container" style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+          
+          <!-- Header -->
+          <div class="header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">🔐 Réinitialisation de mot de passe</h1>
+          </div>
+
+          <!-- Main Content -->
+          <div class="content" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            
+            <h2 style="color: #333; margin-bottom: 20px; font-size: 22px;">Bonjour ${name},</h2>
+
+            <p style="color: #666; line-height: 1.6; margin-bottom: 20px; font-size: 16px;">
+              Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte administrateur USTHB.
+            </p>
+
+            <p style="color: #666; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">
+              Si vous êtes à l&apos;origine de cette demande, cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :
+            </p>
+
+            <!-- Reset Button -->
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetUrl}" 
+                 style="display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                Réinitialiser mon mot de passe
+              </a>
+            </div>
+
+            <!-- Alternative Link -->
+            <p style="color: #999; font-size: 14px; line-height: 1.6; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
+              Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :
+            </p>
+            <p style="color: #667eea; font-size: 13px; word-break: break-all; background: #f5f7ff; padding: 10px; border-radius: 5px; margin: 10px 0;">
+              ${resetUrl}
+            </p>
+
+            <!-- Warning Box -->
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 25px 0; border-radius: 5px;">
+              <p style="margin: 0; color: #856404; font-size: 14px; line-height: 1.6;">
+                <strong>⚠️ Important :</strong><br>
+                Ce lien est valable pendant <strong>1 heure</strong> et ne peut être utilisé qu&apos;une seule fois.
+              </p>
+            </div>
+
+            <!-- Security Notice -->
+            <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px;">
+              <p style="margin: 0; color: #721c24; font-size: 14px; line-height: 1.6;">
+                <strong>🛡️ Sécurité :</strong><br>
+                Si vous n&apos;avez pas demandé cette réinitialisation, ignorez cet email et votre mot de passe restera inchangé.
+              </p>
+            </div>
+
+            <!-- Footer Info -->
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+              <p style="color: #999; font-size: 13px; line-height: 1.6; margin: 0;">
+                Cordialement,<br>
+                <strong style="color: #666;">L&apos;équipe USTHB</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="text-align: center; margin-top: 20px; padding: 20px;">
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              Ceci est un email automatique, merci de ne pas y répondre.
+            </p>
+            <p style="color: #999; font-size: 12px; margin: 5px 0 0 0;">
+              © 2025 USTHB - Tous droits réservés
+            </p>
+          </div>
+
+        </div>
+      </body>
+      </html>
+    `,
+    text: `
+Bonjour ${name},
+
+Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte administrateur USTHB.
+
+Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien suivant :
+${resetUrl}
+
+Ce lien est valable pendant 1 heure et ne peut être utilisé qu'une seule fois.
+
+Si vous n'avez pas demandé cette réinitialisation, ignorez cet email et votre mot de passe restera inchangé.
+
+Cordialement,
+L'équipe USTHB
+    `,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Password reset email sent:', info.messageId);
+    return info;
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    throw error;
+  }
+};

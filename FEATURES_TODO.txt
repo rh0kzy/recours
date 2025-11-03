@@ -23,10 +23,17 @@ FONCTIONNALITÉS À AJOUTER - SYSTÈME DE RECOURS
    - ✅ SessionManager component intégré dans le layout admin
    - ✅ Message d'information lors de déconnexion pour inactivité
 
-3. Password Reset
-   - Fonctionnalité "Mot de passe oublié"
-   - Envoi d'email avec lien de réinitialisation
-   - Le lien "Forgot password?" existe déjà mais n'est pas fonctionnel
+3. ✅ Password Reset (TERMINÉ)
+   - ✅ Fonctionnalité "Mot de passe oublié" complète
+   - ✅ Envoi d'email avec lien de réinitialisation sécurisé
+   - ✅ Le lien "Mot de passe oublié ?" est maintenant fonctionnel
+   - ✅ Token sécurisé avec expiration de 1 heure
+   - ✅ Validation du mot de passe (minimum 8 caractères)
+   - ✅ Invalidation de toutes les sessions après réinitialisation
+   - ✅ Page de demande de réinitialisation (/admin/forgot-password)
+   - ✅ Page de réinitialisation avec token (/admin/reset-password?token=xxx)
+   - ✅ Email HTML responsive avec instructions claires
+   - ✅ Logs d'audit pour tracer les réinitialisations
 
 4. 2FA (Two-Factor Authentication)
    - Pour les Super Admins
