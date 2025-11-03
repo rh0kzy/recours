@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import AdminHeader from '@/components/AdminHeader';
 
 interface Request {
   id: number;
@@ -28,6 +30,12 @@ interface Notification {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<{
+    name: string;
+    email: string;
+    role: string;
+  } | null>(null);
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +54,29 @@ export default function AdminPage() {
     approved: number;
     rejected: number;
   } | null>(null);
+
+  // Check session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/auth/session');
+        if (!response.ok) {
+          router.push('/admin/login');
+          return;
+        }
+        const data = await response.json();
+        setCurrentUser({
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role
+        });
+      } catch (error) {
+        console.error('Session check failed:', error);
+        router.push('/admin/login');
+      }
+    };
+    checkSession();
+  }, [router]);
 
   useEffect(() => {
     fetchRequests();
@@ -374,6 +405,9 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Admin Header */}
+      {currentUser && <AdminHeader user={currentUser} />}
+      
       {/* Système de notifications */}
       <div className="fixed top-4 left-4 right-4 sm:top-4 sm:right-4 sm:left-auto z-50 space-y-3 max-w-sm sm:max-w-sm mx-auto sm:mx-0">
         {notifications.map((notification) => (
