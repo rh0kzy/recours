@@ -311,7 +311,7 @@ export function getRoleIcon(role: AdminRole): string {
 // EXPORT ALL
 // ================================================
 
-export default {
+const permissionsExport = {
   PERMISSIONS,
   ROLE_PERMISSIONS,
   ROLE_METADATA,
@@ -328,3 +328,5 @@ export default {
   getRoleColor,
   getRoleIcon,
 };
+
+export default permissionsExport;

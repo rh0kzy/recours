@@ -81,6 +81,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     fetchRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fonctions de gestion des notifications
@@ -109,7 +110,7 @@ export default function AdminPage() {
 
   const showSuccess = (title: string, message: string) => addNotification('success', title, message);
   const showError = (title: string, message: string) => addNotification('error', title, message);
-  const showInfo = (title: string, message: string) => addNotification('info', title, message);
+  // const showInfo = (title: string, message: string) => addNotification('info', title, message);
   const showWarning = (title: string, message: string) => addNotification('warning', title, message);
 
   // Fonction utilitaire pour formater les dates
@@ -352,7 +353,7 @@ export default function AdminPage() {
       });
 
       if (response.ok) {
-        const responseData = await response.json();
+        // const responseData = await response.json();
         
         if (status === 'approved' && selectedRequest) {
           showSuccess(
@@ -777,7 +778,7 @@ export default function AdminPage() {
                             <div>
                               <p className="text-yellow-100 text-sm font-semibold">Permissions limitées</p>
                               <p className="text-yellow-200 text-xs mt-1">
-                                Votre rôle ({getRoleLabel(currentUser.role)}) ne permet pas d'approuver ou refuser les demandes.
+                                Votre rôle ({getRoleLabel(currentUser.role)}) ne permet pas d&apos;approuver ou refuser les demandes.
                               </p>
                             </div>
                           </div>

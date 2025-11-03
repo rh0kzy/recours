@@ -171,7 +171,7 @@ export default function UsersPage() {
 
       if (!response.ok) throw new Error('Failed to update user');
       fetchUsers();
-    } catch (err) {
+    } catch {
       alert('Échec de la mise à jour du statut');
     }
   };

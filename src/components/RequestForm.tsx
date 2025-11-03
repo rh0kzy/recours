@@ -62,7 +62,7 @@ export default function RequestForm() {
 
   const showSuccess = (title: string, message: string) => addNotification('success', title, message);
   const showError = (title: string, message: string) => addNotification('error', title, message);
-  const showInfo = (title: string, message: string) => addNotification('info', title, message);
+  // const showInfo = (title: string, message: string) => addNotification('info', title, message);
   const showWarning = (title: string, message: string) => addNotification('warning', title, message);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
