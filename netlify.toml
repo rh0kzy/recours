@@ -4,25 +4,10 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-[[redirects]]
-  from = "/api/health"
-  to = "/.netlify/functions/health"
-  status = 200
-
-[[redirects]]
-  from = "/api/test-db-connection"
-  to = "/.netlify/functions/test-db-connection"
-  status = 200
-
-[[redirects]]
-  from = "/api/setup-database"
-  to = "/.netlify/functions/setup-database"
-  status = 200
 
 [[redirects]]
   from = "/api/submit-request"
@@ -48,5 +33,7 @@
 # Fallback for all other routes to Next.js
 [[redirects]]
   from = "/*"
+  to = "/index.html"
+  status = 200
   to = "/index.html"
   status = 200
