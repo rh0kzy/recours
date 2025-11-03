@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import Link from 'next/link';
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -16,6 +17,15 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
   const [isRateLimited, setIsRateLimited] = useState(false);
+  const [sessionExpiredMessage, setSessionExpiredMessage] = useState('');
+
+  // Vérifier si redirigé pour cause de session expirée
+  useEffect(() => {
+    const reason = searchParams.get('reason');
+    if (reason === 'session_expired') {
+      setSessionExpiredMessage('Votre session a expiré en raison d\'inactivité. Veuillez vous reconnecter.');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +104,18 @@ export default function AdminLoginPage() {
         {/* Login Form */}
         <div className="mt-6 sm:mt-8 bg-gray-800/50 backdrop-blur-sm py-6 sm:py-8 px-4 sm:px-6 shadow-2xl rounded-2xl border border-gray-700">
           <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
+            {/* Session Expired Message */}
+            {sessionExpiredMessage && (
+              <div className="bg-yellow-500/10 border border-yellow-500/50 text-yellow-400 px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-xs sm:text-sm">
+                <div className="flex items-start">
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <span className="break-words">{sessionExpiredMessage}</span>
+                </div>
+              </div>
+            )}
+
             {/* Error Message */}
             {error && (
               <div className={`border px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-xs sm:text-sm ${
@@ -240,5 +262,13 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

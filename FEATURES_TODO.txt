@@ -14,9 +14,14 @@ FONCTIONNALITÉS À AJOUTER - SYSTÈME DE RECOURS
    - ✅ API pour voir les comptes verrouillés
    - [ ] TODO: Protéger les autres API contre les abus (si nécessaire)
 
-2. Session Timeout
-   - Déconnexion automatique après 30 min d'inactivité
-   - Rafraîchissement du token JWT
+2. ✅ Session Timeout (TERMINÉ)
+   - ✅ Déconnexion automatique après 30 min d'inactivité
+   - ✅ Rafraîchissement automatique du token JWT (5 min avant expiration)
+   - ✅ Détection d'activité utilisateur (souris, clavier, scroll)
+   - ✅ Hook useSessionTimeout pour gérer le timeout
+   - ✅ API endpoint /api/auth/refresh pour rafraîchir le token
+   - ✅ SessionManager component intégré dans le layout admin
+   - ✅ Message d'information lors de déconnexion pour inactivité
 
 3. Password Reset
    - Fonctionnalité "Mot de passe oublié"
